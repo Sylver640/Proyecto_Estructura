@@ -1,6 +1,10 @@
-#ifndef menu_h
-#define menu_h
+#ifndef MENU_h
+#define MENU_h
 
-void menu(void);
+void gotoxy (int x, int y);
 
-#endif
+void centerText (const char *text, int y);
+
+void logo();
+
+#endif /* MENU_h */
