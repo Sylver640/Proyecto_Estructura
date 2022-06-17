@@ -34,6 +34,42 @@ typedef struct userType
         HashMap* moviesByGenre;
 } userType;
 
+/*
+  función para comparar claves de tipo string
+  retorna 1 si son iguales
+*/
+int is_equal_string(void * key1, void * key2) {
+    if(strcmp((char*)key1, (char*)key2)==0) return 1;
+    return 0;
+}
+
+/*
+  función para comparar claves de tipo string
+  retorna 1 si son key1<key2
+*/
+int lower_than_string(void * key1, void * key2) {
+    if(strcmp((char*)key1, (char*)key2) < 0) return 1;
+    return 0;
+}
+
+/*
+  función para comparar claves de tipo int
+  retorna 1 si son iguales
+*/
+int is_equal_int(void * key1, void * key2) {
+    if(*(int*)key1 == *(int*)key2) return 1;
+    return 0;
+}
+
+/*
+  función para comparar claves de tipo int
+  retorna 1 si son key1<key2
+*/
+int lower_than_int(void * key1, void * key2) {
+    if(*(int*)key1 < *(int*)key2) return 1;
+    return 0;
+}
+
 //Función que recibe campos de un archivo CSV separado por comas.
 char *get_csv_field (char * tmp, int k) {
     int open_mark = 0;
@@ -74,7 +110,7 @@ char *get_csv_field (char * tmp, int k) {
     return NULL;
 }
 
-void login (userType* user, char* username)
+void login (char* username, userType* loggedUser)
 {
         char path[100];
         system("cls");
@@ -82,31 +118,56 @@ void login (userType* user, char* username)
 
         gotoxy(25, 5);
         printf("Enter your username: ");
-        scanf("%100[^\n]s", username);
+        scanf("%[^\n]s", username);
+        getchar();
 
-        //snprintf(path, sizeof(path), "users/%s.csv", username);
-        //FILE* f = fopen(path, "rt");
-        /*if (f == NULL)
+        printf("se inicializa usuario\n");
+
+        snprintf(path, sizeof(path), "users/%s.csv", username);
+        FILE* f = fopen(path, "rt");
+        if (f == NULL)
         {
                 printf("This user doesn't exist!\nCreating it now...\n");
                 getch();
                 f = fopen(path, "wt");
-        }*/
+        }
+
+        loggedUser->movieMap = createMap(20);
+
+        char linea[1024];
+        int i;
+        int k = 0;
+
+        while (fgets(linea, 1023, f) != NULL)
+        {
+                for (i = 0; i < 1; i++)
+                {
+                        movieType* newMovie = (movieType*) malloc (sizeof(newMovie));
+                        char *movie_id = get_csv_field(linea, i);
+                        int id_to_number = atoi(movie_id);
+                        newMovie->movie_id = id_to_number;
+                        char *movieName = get_csv_field(linea, i+1);
+                        strcpy(newMovie->movieName, movieName);
+                        char* movieYear = get_csv_field(linea, i+2);
+                        int yearToNumber = atoi(movieYear);
+                        newMovie->year = yearToNumber;
+                        insertMap(loggedUser->movieMap, movie_id, newMovie);
+                }
+        }
 }
 
 int main()
 {
-    int option;
     char* loggedUserName = (char*) malloc (100*sizeof(char));
-    userType* loggedUser = (userType*) malloc (sizeof(loggedUser));
-    login(loggedUser, loggedUserName);
-    getchar();
+    userType* loggedUser = (userType*) malloc (sizeof(userType));
+    login(loggedUserName, loggedUser);
+    int option;
     //MENÚ PROVISORIO
-    while (option != 0)
+    while (1)
     {
         system("cls");
         gotoxy(30, 1);
-        printf("WELCOME, %s\n", loggedUser);
+        printf("WELCOME, %s\n", loggedUserName);
         gotoxy(30, 2);
         printf("1. Add movies\n");
         gotoxy(30, 3);
@@ -161,7 +222,7 @@ int main()
                         centerText("See you later :)", 5);
                         getch();
                         system("cls");
-                        break;
+                        return 0;
         }
     }
     return 0;
