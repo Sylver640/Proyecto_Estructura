@@ -1,7 +1,6 @@
 /*
 COMENTARIOS:
 - Promediar cada película según un usuario la vaya agregando
-- Mapa general para las películas
 */
 
 
@@ -117,7 +116,7 @@ char *get_csv_field (char * tmp, int k) {
     return NULL;
 }
 
-void login (char* username, userType* loggedUser)
+void login (char* username, userType* loggedUser, HashMap* globalMovieMap)
 {
         char path[100];
         system("cls");
@@ -128,19 +127,28 @@ void login (char* username, userType* loggedUser)
         scanf("%[^\n]s", username);
         getchar();
 
-        printf("se inicializa usuario\n");
-
         snprintf(path, sizeof(path), "users/%s.csv", username);
         FILE* f = fopen(path, "rt");
         if (f == NULL)
         {
-                printf("This user doesn't exist!\nCreating it now...\n");
+                gotoxy(25, 7);
+                printf("This user doesn't exist!\n");
+                gotoxy(25,8);
+                printf("Creating it now...\n");
                 getch();
                 f = fopen(path, "wt");
+                return;
         }
+
+        strcpy(loggedUser->user_id, username);
+        loggedUser->movieNumber = 0;
 
         loggedUser->movieMap = createMap(20);
         loggedUser->abcOrder = createTreeMap(lower_than_string);
+        loggedUser->moviesByGenre = createMap(20);
+        loggedUser->ratingOrder = createTreeMap(lower_than_int);
+        loggedUser->runtimeOrder = createTreeMap(lower_than_int);
+        loggedUser->yearOrder = createTreeMap(lower_than_int);
 
         char linea[1024];
         int i;
@@ -160,15 +168,19 @@ void login (char* username, userType* loggedUser)
                         int yearToNumber = atoi(movieYear);
                         newMovie->year = yearToNumber;
                         insertMap(loggedUser->movieMap, movie_id, newMovie);
+                        insertMap(globalMovieMap, movie_id, newMovie);
+                        insertTreeMap(loggedUser->abcOrder, newMovie->movieName, newMovie);
+                        loggedUser->movieNumber++;
                 }
         }
 }
 
 int main()
 {
+    HashMap* globalMovieMap = createMap(30);
     char* loggedUserName = (char*) malloc (100*sizeof(char));
     userType* loggedUser = (userType*) malloc (sizeof(userType));
-    login(loggedUserName, loggedUser);
+    login(loggedUserName, loggedUser, globalMovieMap);
     int option;
     //MENÚ PROVISORIO
     while (1)
