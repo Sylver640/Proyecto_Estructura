@@ -3,7 +3,6 @@ COMENTARIOS:
 - Promediar cada película según un usuario la vaya agregando
 */
 
-
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
@@ -21,11 +20,11 @@ COMENTARIOS:
 typedef struct movieType
 {
         char* movieName;
-        int movie_id;
-        int year;
+        char* movie_id;
+        int* year;
         List* genres;
-        int userScore;
-        int runtime;       
+        int* userScore;
+        int* runtime;       
 } movieType;
 
 typedef struct userType
@@ -39,6 +38,12 @@ typedef struct userType
         TreeMap* runtimeOrder;
         HashMap* moviesByGenre;
 } userType;
+
+typedef struct movieCategory
+{
+        char* name;
+        List* movie_list;
+} movieCategory;
 
 /*
   función para comparar claves de tipo string
@@ -141,8 +146,8 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap)
         }
 
         strcpy(loggedUser->user_id, username);
+        printf("se copia nombre de usuario\n");
         loggedUser->movieNumber = 0;
-
         loggedUser->movieMap = createMap(20);
         loggedUser->abcOrder = createTreeMap(lower_than_string);
         loggedUser->moviesByGenre = createMap(20);
@@ -153,26 +158,99 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap)
         char linea[1024];
         int i;
         int k = 0;
+        Pair* searchData;
 
         while (fgets(linea, 1023, f) != NULL)
         {
                 for (i = 0; i < 1; i++)
                 {
-                        movieType* newMovie = (movieType*) malloc (sizeof(newMovie));
-                        char *movie_id = get_csv_field(linea, i);
-                        int id_to_number = atoi(movie_id);
-                        newMovie->movie_id = id_to_number;
-                        char *movieName = get_csv_field(linea, i+1);
+                        movieType* newMovie = (movieType*) malloc (sizeof(movieType));
+                        newMovie->movie_id = (char*) malloc (100*sizeof(char));
+                        newMovie->movieName = (char*) malloc (200*sizeof(char));
+                        newMovie->year = (int*) malloc (sizeof(int));
+                        newMovie->runtime = (int*) malloc (sizeof(int));
+                        newMovie->userScore = (int*) malloc (sizeof(int));
+
+                        char* movie_id = get_csv_field(linea, i);
+                        strcpy(newMovie->movie_id, movie_id);
+
+                        char* movieName = get_csv_field(linea, i+1);
                         strcpy(newMovie->movieName, movieName);
+                        
                         char* movieYear = get_csv_field(linea, i+2);
                         int yearToNumber = atoi(movieYear);
-                        newMovie->year = yearToNumber;
+                        *newMovie->year = yearToNumber;
+
+                        //aqui van a ir los generos, pero tengo que hacer la funcion de separar todavía :p
+
+                        char* runtime = get_csv_field(linea, i+4);
+                        int runtimeToNumber = atoi(runtime);
+                        *newMovie->runtime = runtimeToNumber;
+                        
+                        char* userScore = get_csv_field(linea, i+5);
+                        int scoreToNumber = atoi(userScore);
+                        *newMovie->userScore = scoreToNumber;
+
                         insertMap(loggedUser->movieMap, movie_id, newMovie);
+                        
                         insertMap(globalMovieMap, movie_id, newMovie);
+                        
                         insertTreeMap(loggedUser->abcOrder, newMovie->movieName, newMovie);
+
+                        if (searchTreeMap(loggedUser->yearOrder, newMovie->year) == NULL)
+                        {
+                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                                newCategory->name = (char*) malloc (100*sizeof(char));
+                                strcpy(newCategory->name, movieYear);
+                                newCategory->movie_list = createList();
+                                pushBack(newCategory->movie_list, newMovie);
+                                insertTreeMap(loggedUser->yearOrder, newMovie->year, newCategory);
+                        }
+                        else
+                        {
+                                searchData = searchTreeMap(loggedUser->yearOrder, newMovie->year);
+                                movieCategory* yearSearched = searchData->value;
+                                pushBack(yearSearched->movie_list, newMovie);
+                        }
+
+                        if (searchTreeMap(loggedUser->runtimeOrder, newMovie->runtime) == NULL)
+                        {
+                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                                newCategory->name = (char*) malloc (100*sizeof(char));
+                                strcpy(newCategory->name, runtime);
+                                newCategory->movie_list = createList();
+                                pushBack(newCategory->movie_list, newMovie);
+                                insertTreeMap(loggedUser->runtimeOrder, newMovie->runtime, newCategory);
+                        }
+                        else
+                        {
+                                searchData = searchTreeMap(loggedUser->runtimeOrder, newMovie->runtime);
+                                movieCategory* runtimeSearched = searchData->value;
+                                pushBack(runtimeSearched->movie_list, newMovie);
+                        }
+                        
+
+                        if (searchTreeMap(loggedUser->ratingOrder, newMovie->userScore) == NULL)
+                        {
+                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                                newCategory->name = (char*) malloc (100*sizeof(char));
+                                strcpy(newCategory->name, userScore);
+                                newCategory->movie_list = createList();
+                                pushBack(newCategory->movie_list, newMovie);
+                                insertTreeMap(loggedUser->ratingOrder, newMovie->userScore, newCategory);
+                        }
+                        else
+                        {
+                                searchData = searchTreeMap(loggedUser->ratingOrder, newMovie->userScore);
+                                movieCategory* ratingSearched = searchData->value;
+                                pushBack(ratingSearched->movie_list, newMovie);
+                        }
                         loggedUser->movieNumber++;
                 }
+                k++;
         }
+        
+        fclose(f);
 }
 
 int main()
@@ -181,6 +259,8 @@ int main()
     char* loggedUserName = (char*) malloc (100*sizeof(char));
     userType* loggedUser = (userType*) malloc (sizeof(userType));
     login(loggedUserName, loggedUser, globalMovieMap);
+    //estaba pensando que, en vez de abrir un usuario cuando se necesite, tras el login del usuario, abrir los demás archivos con otra función
+    //https://www.decodeschool.com/C-Programming/File-Operations/C-Program-to-read-all-the-files-located-in-the-specific-directory
     int option;
     //MENÚ PROVISORIO
     while (1)
@@ -191,7 +271,7 @@ int main()
         gotoxy(30, 2);
         printf("1. Add movies\n");
         gotoxy(30, 3);
-        printf("2. Search for a movie\n");
+        printf("2. Search for a movie\n"); //así que, en vez de aquí buscar csv por csv, solo bastaría con abrir el mapa global
         gotoxy(30, 4);
         printf("3. Show user's movies\n");
         gotoxy(30, 5);
