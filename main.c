@@ -1,3 +1,10 @@
+/*
+COMENTARIOS:
+- Promediar cada película según un usuario la vaya agregando
+- Mapa general para las películas
+*/
+
+
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
@@ -133,6 +140,7 @@ void login (char* username, userType* loggedUser)
         }
 
         loggedUser->movieMap = createMap(20);
+        loggedUser->abcOrder = createTreeMap(lower_than_string);
 
         char linea[1024];
         int i;
