@@ -11,6 +11,7 @@ COMENTARIOS:
 #include <stdbool.h>
 #include <math.h>
 #include <windows.h>
+#include <dirent.h>
 
 #include "include/list.h"
 #include "include/hashmap.h"
@@ -121,7 +122,33 @@ char *get_csv_field (char * tmp, int k) {
     return NULL;
 }
 
-void login (char* username, userType* loggedUser, HashMap* globalMovieMap)
+userType* createUser(char* username)
+{
+        userType* newUser = (userType*) malloc (sizeof(userType));
+        newUser->user_id = (char*) malloc (100*sizeof(char));
+        strcpy(newUser->user_id, username);
+        newUser->movieNumber = 0;
+        newUser->movieMap = createMap(20);
+        newUser->abcOrder = createTreeMap(lower_than_string);
+        newUser->moviesByGenre = createMap(20);
+        newUser->ratingOrder = createTreeMap(lower_than_int);
+        newUser->runtimeOrder = createTreeMap(lower_than_int);
+        newUser->yearOrder = createTreeMap(lower_than_int);
+        return newUser;
+}
+
+movieType* createMovie()
+{
+        movieType* new = (movieType*) malloc (sizeof(movieType));
+        new->movie_id = (char*) malloc (100*sizeof(char));
+        new->movieName = (char*) malloc (200*sizeof(char));
+        new->year = (int*) malloc (sizeof(int));
+        new->genres = createList();
+        new->runtime = (int*) malloc (sizeof(int));
+        new->userScore = (int*) malloc (sizeof(int));
+}
+
+void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashMap* usersMap)
 {
         char path[100];
         system("cls");
@@ -145,15 +172,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap)
                 return;
         }
 
-        strcpy(loggedUser->user_id, username);
-        printf("se copia nombre de usuario\n");
-        loggedUser->movieNumber = 0;
-        loggedUser->movieMap = createMap(20);
-        loggedUser->abcOrder = createTreeMap(lower_than_string);
-        loggedUser->moviesByGenre = createMap(20);
-        loggedUser->ratingOrder = createTreeMap(lower_than_int);
-        loggedUser->runtimeOrder = createTreeMap(lower_than_int);
-        loggedUser->yearOrder = createTreeMap(lower_than_int);
+        loggedUser = createUser(username);
 
         char linea[1024];
         int i;
@@ -164,12 +183,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap)
         {
                 for (i = 0; i < 1; i++)
                 {
-                        movieType* newMovie = (movieType*) malloc (sizeof(movieType));
-                        newMovie->movie_id = (char*) malloc (100*sizeof(char));
-                        newMovie->movieName = (char*) malloc (200*sizeof(char));
-                        newMovie->year = (int*) malloc (sizeof(int));
-                        newMovie->runtime = (int*) malloc (sizeof(int));
-                        newMovie->userScore = (int*) malloc (sizeof(int));
+                        movieType* newMovie = createMovie();
 
                         char* movie_id = get_csv_field(linea, i);
                         strcpy(newMovie->movie_id, movie_id);
@@ -190,6 +204,9 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap)
                         char* userScore = get_csv_field(linea, i+5);
                         int scoreToNumber = atoi(userScore);
                         *newMovie->userScore = scoreToNumber;
+
+                        if (searchMap(globalMovieMap, movie_id) != NULL)
+                                continue;
 
                         insertMap(loggedUser->movieMap, movie_id, newMovie);
                         
@@ -247,20 +264,68 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap)
                         }
                         loggedUser->movieNumber++;
                 }
-                k++;
+                //k++;
         }
+
+        insertMap(usersMap, username, loggedUser);
         
         fclose(f);
 }
 
+void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMap)
+{
+        DIR *d;
+        struct dirent *dir;
+        FILE *f;
+
+        char ignored_file[100];
+        strcpy(ignored_file, ignored_user);
+        strcat(ignored_file, ".csv");
+
+        d = opendir("./users");
+
+        if (d)
+        {
+                while((dir = readdir(d)) != NULL)
+                {
+                        //snprintf(filename, sizeof(filename), "users/%s.csv", username);
+                        if (strcmp(dir->d_name, ignored_file) == 0)
+                                continue;
+                        
+                        f = fopen(dir->d_name, "rt");
+                        char newuser_username[100];
+                        if (strlen(dir->d_name) > 5)
+                        {
+                                int to_delete = strlen(dir->d_name) - 4;
+                                printf("se crea to_delete\n");
+                                strncpy(newuser_username, dir->d_name, to_delete);
+
+                                printf("nuevo usuario: %s\n", newuser_username);
+                                getch();
+                        }
+
+
+
+                        fclose(f);
+                        //free(newuser_username);
+                }
+        }
+
+        closedir(d);
+}
+
 int main()
 {
+    HashMap* usersMap = createMap(30); //<-- así como veo, también veo más factible crear un mapa con los usuarios
     HashMap* globalMovieMap = createMap(30);
     char* loggedUserName = (char*) malloc (100*sizeof(char));
-    userType* loggedUser = (userType*) malloc (sizeof(userType));
-    login(loggedUserName, loggedUser, globalMovieMap);
+    userType* loggedUser;
+    
+    login(loggedUserName, loggedUser, globalMovieMap, usersMap);
+    
     //estaba pensando que, en vez de abrir un usuario cuando se necesite, tras el login del usuario, abrir los demás archivos con otra función
-    //https://www.decodeschool.com/C-Programming/File-Operations/C-Program-to-read-all-the-files-located-in-the-specific-directory
+    addOtherUsers(loggedUserName, usersMap, globalMovieMap);
+    
     int option;
     //MENÚ PROVISORIO
     while (1)
