@@ -549,12 +549,17 @@ void searchByID(HashMap* allMovies, char ID){
         system("cls");
         //Par* foundMovie = searchMap(allMovies, ID);
         /*if(foundMovie != NULL){
+            printf("Your movie has been found!\n\n");    
             movieType* movieData = foundMovie->value;
 
-        }*/
+            printf("Title: %s\n
+                    ID: %s\n
+                    Year: %d\n
+                    Genres: \n <--- Falta analizar lista de generos.
+                    User Score: %d\n
+                    Runtime: %d minutes", movieData->movieName, movieData->movie_id, movieData->year, ..., movieData->userScore, movieData->runtime);
 
-
-        return;
+        }else printf("We are sorry, your movie could not be found.")*/
 }
 
 int main()
