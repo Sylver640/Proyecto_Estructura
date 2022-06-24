@@ -545,12 +545,25 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser) //tendría que pon
         
 }
 
+void searchByID(HashMap* allMovies, char ID){
+        system("cls");
+        //Par* foundMovie = searchMap(allMovies, ID);
+        /*if(foundMovie != NULL){
+            movieType* movieData = foundMovie->value;
+
+        }*/
+
+
+        return;
+}
+
 int main()
 {
     HashMap* usersMap = createMap(30); //<-- así como veo, también veo más factible crear un mapa con los usuarios
     HashMap* globalMovieMap = createMap(30);
     char* loggedUserName = (char*) malloc (100*sizeof(char));
     userType* loggedUser;
+    char movieID; //<-- Para recibir el ID de la pelicula a buscar en la función 2.
     
     login(loggedUserName, loggedUser, globalMovieMap, usersMap);
     addOtherUsers(loggedUserName, usersMap, globalMovieMap);
@@ -591,7 +604,10 @@ int main()
                         break;
                 case 3: system("cls");
                         gotoxy(30,4);
-                        printf("NOT IMPLEMENTED YET\n");
+                        printf("Please enter the ID of the movie you are looking for: ");
+                        scanf("%s", &movieID);
+                        searchByID(globalMovieMap, movieID);
+                        printf("\n WORK IN PROGRESS!\n");
                         getch();
                         break;
                 case 4: system("cls");
