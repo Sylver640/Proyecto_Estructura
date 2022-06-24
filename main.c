@@ -524,6 +524,27 @@ void addMovies(HashMap* globalMap, userType* user)
 
 }
 
+void movieDiscovery (HashMap* usersMap, userType* loggedUser) //tendría que poner movie list para la búsqueda por género?
+{
+        //recomendar películas según coincidencia de películas favoritas con algún usuario (definir número), y recomendar películas que el usuario 
+        //no haya visto pero si el usuario que encontramos con afinidad
+        //si eso no funciona, hacer el mismo estilo de búsqueda pero con géneros
+        char username[100];
+        printf("Enter other username for comparison: ");
+        scanf("%[^\n]s", username);
+        getchar();
+
+        Pair* searched_result = searchMap(usersMap, username);
+        if ( searched_result == NULL)
+        {
+                printf("The user you are searching for does not exist.");
+                return;
+        }
+        userType* otherUser = searched_result->value;
+        
+        
+}
+
 int main()
 {
     HashMap* usersMap = createMap(30); //<-- así como veo, también veo más factible crear un mapa con los usuarios
