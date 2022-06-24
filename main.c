@@ -148,9 +148,18 @@ movieType* createMovie()
         new->userScore = (int*) malloc (sizeof(int));
 }
 
-void splitGenres()
+void split_and_AddGenres(char* genres, movieType* movie)
 {
-
+        char limit[3] = ", ";
+        char* token = strtok(genres, limit);
+        if (token != NULL)
+        {
+                while (token != NULL)
+                {
+                        pushBack(movie->genres, token);
+                        token = strtok(NULL, limit);
+                }
+        }
 }
 
 void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashMap* usersMap)
@@ -159,6 +168,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
         system("cls");
         logo();
 
+        //aquí tengo que arreglar un problema donde se acepta la tecla enter como username, y crea un csv con nombre basura
         gotoxy(25, 5);
         printf("Enter your username: ");
         scanf("%[^\n]s", username);
@@ -181,7 +191,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
 
         char linea[1024];
         int i;
-        Pair* searchData;
+        Pair* searchTreeMapData;
 
         while (fgets(linea, 1023, f) != NULL)
         {
@@ -199,8 +209,8 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                         int yearToNumber = atoi(movieYear);
                         *newMovie->year = yearToNumber;
 
-                        //aqui van a ir los generos, pero tengo que hacer la funcion de separar todavía :p
-                        //splitGenres();
+                        char* movie_genres = get_csv_field(linea, i+3);
+                        split_and_AddGenres(movie_genres, newMovie);
 
                         char* runtime = get_csv_field(linea, i+4);
                         int runtimeToNumber = atoi(runtime);
@@ -230,9 +240,31 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                         }
                         else
                         {
-                                searchData = searchTreeMap(loggedUser->yearOrder, newMovie->year);
-                                movieCategory* yearSearched = searchData->value;
+                                searchTreeMapData = searchTreeMap(loggedUser->yearOrder, newMovie->year);
+                                movieCategory* yearSearched = searchTreeMapData->value;
                                 pushBack(yearSearched->movie_list, newMovie);
+                        }
+
+                        //generos
+                        char* searched_genre = firstList(newMovie->genres);
+                        while (searched_genre != NULL)
+                        {
+                                if (searchMap(loggedUser->moviesByGenre, searched_genre) == NULL)
+                                {
+                                        movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                                        newCategory->name = (char*) malloc (100*sizeof(char));
+                                        strcpy(newCategory->name, searched_genre);
+                                        newCategory->movie_list = createList();
+                                        pushBack(newCategory->movie_list, newMovie);
+                                        insertMap(loggedUser->moviesByGenre, searched_genre, newMovie);
+                                }
+                                else
+                                {
+                                        Par* searchData = searchMap(loggedUser->moviesByGenre, searched_genre);
+                                        movieCategory* genreInMap = searchData->value;
+                                        //pushBack(genreInMap->movie_list, newMovie); no se qué pasa con el pushBack aquí
+                                }
+                                searched_genre = nextList(newMovie->genres);
                         }
 
                         if (searchTreeMap(loggedUser->runtimeOrder, newMovie->runtime) == NULL)
@@ -246,8 +278,8 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                         }
                         else
                         {
-                                searchData = searchTreeMap(loggedUser->runtimeOrder, newMovie->runtime);
-                                movieCategory* runtimeSearched = searchData->value;
+                                searchTreeMapData = searchTreeMap(loggedUser->runtimeOrder, newMovie->runtime);
+                                movieCategory* runtimeSearched = searchTreeMapData->value;
                                 pushBack(runtimeSearched->movie_list, newMovie);
                         }
                         
@@ -263,8 +295,8 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                         }
                         else
                         {
-                                searchData = searchTreeMap(loggedUser->ratingOrder, newMovie->userScore);
-                                movieCategory* ratingSearched = searchData->value;
+                                searchTreeMapData = searchTreeMap(loggedUser->ratingOrder, newMovie->userScore);
+                                movieCategory* ratingSearched = searchTreeMapData->value;
                                 pushBack(ratingSearched->movie_list, newMovie);
                         }
                         loggedUser->movieNumber++;
@@ -325,8 +357,9 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                                         int yearToNumber = atoi(movieYear);
                                         *newMovie->year = yearToNumber;
 
-                                        //al igual que antes, me falta hacer lo de los generos
-                                        //splitGenres();
+                                        char* movie_genres = get_csv_field(linea, k+3);
+                                        split_and_AddGenres(movie_genres, newMovie);
+                                        if (firstList(newMovie->genres) != NULL) printf("se insertan generos\n");getch(); //testing
 
                                         char* runtime = get_csv_field(linea, k+4);
                                         int runtimeToNumber = atoi(runtime);
@@ -359,6 +392,26 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                                                 searchData = searchTreeMap(newUser->yearOrder, newMovie->year);
                                                 movieCategory* yearSearched = searchData->value;
                                                 pushBack(yearSearched->movie_list, newMovie);
+                                        }
+                                        char* searched_genre = firstList(newMovie->genres);
+                                        while (searched_genre != NULL)
+                                        {
+                                                if (searchMap(newUser->moviesByGenre, searched_genre) == NULL)
+                                                {
+                                                        movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                                                        newCategory->name = (char*) malloc (100*sizeof(char));
+                                                        strcpy(newCategory->name, searched_genre);
+                                                        newCategory->movie_list = createList();
+                                                        pushBack(newCategory->movie_list, newMovie);
+                                                        insertMap(newUser->moviesByGenre, searched_genre, newMovie);
+                                                }
+                                                else
+                                                {
+                                                        Par* searchData = searchMap(newUser->moviesByGenre, searched_genre);
+                                                        movieCategory* genreInMap = searchData->value;
+                                                        //pushBack(genreInMap->movie_list, newMovie); no se qué pasa con el pushBack aquí
+                                                }
+                                                searched_genre = nextList(newMovie->genres);
                                         }
 
                                         if (searchTreeMap(newUser->runtimeOrder, newMovie->runtime) == NULL)
@@ -408,6 +461,46 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
         closedir(d);
 }
 
+//al terminar cada función de añadir, recordar actualizar el csv del usuario
+
+void manualAdd(HashMap* globalMap, userType* user)
+{
+        system("cls");
+        
+        movieType* newMovie = createMovie();
+        char* movie_id = (char*) malloc (100*sizeof(char));
+        gotoxy(30, 2);
+        printf("We need some information first...\n");
+
+        gotoxy(29, 3);
+        printf("Movie ID: ");
+        scanf("%[^\n]s", movie_id);
+        getchar();
+        if (searchMap(user->movieMap, movie_id) != NULL) //<-- hay algo raro con el search
+        {
+                system("cls");
+                gotoxy(30, 4);
+                printf("You already added this movie!\n");
+                return;
+        }
+        gotoxy(29, 4);
+        printf("Name: ");
+        scanf("%[^\n]s", newMovie->movieName);
+        getchar();
+
+
+        getch();
+        return;
+}
+
+void import_csv(HashMap* globalMap, userType* user)
+{
+        system("cls");
+
+        getch();
+        return;
+}
+
 void addMovies(HashMap* globalMap, userType* user)
 {
         int option;
@@ -419,6 +512,15 @@ void addMovies(HashMap* globalMap, userType* user)
         gotoxy(30,4);
         printf("Select an option: ");
         scanf("%i", &option);
+        getchar();
+
+        switch(option)
+        {
+                case 1: manualAdd(globalMap, user);
+                        break;
+                case 2: import_csv(globalMap, user);
+                        break;
+        }
 
 }
 
