@@ -187,7 +187,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                 return;
         }
 
-        loggedUser = createUser(username);
+        //loggedUser = createUser(username);
 
         char linea[1024];
         int i;
@@ -245,7 +245,6 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                                 pushBack(yearSearched->movie_list, newMovie);
                         }
 
-                        //generos
                         char* searched_genre = firstList(newMovie->genres);
                         while (searched_genre != NULL)
                         {
@@ -256,13 +255,13 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                                         strcpy(newCategory->name, searched_genre);
                                         newCategory->movie_list = createList();
                                         pushBack(newCategory->movie_list, newMovie);
-                                        insertMap(loggedUser->moviesByGenre, searched_genre, newMovie);
+                                        insertMap(loggedUser->moviesByGenre, searched_genre, newCategory);
                                 }
                                 else
                                 {
                                         Par* searchData = searchMap(loggedUser->moviesByGenre, searched_genre);
                                         movieCategory* genreInMap = searchData->value;
-                                        //pushBack(genreInMap->movie_list, newMovie); no se qué pasa con el pushBack aquí
+                                        pushBack(genreInMap->movie_list, newMovie);
                                 }
                                 searched_genre = nextList(newMovie->genres);
                         }
@@ -403,13 +402,13 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                                                         strcpy(newCategory->name, searched_genre);
                                                         newCategory->movie_list = createList();
                                                         pushBack(newCategory->movie_list, newMovie);
-                                                        insertMap(newUser->moviesByGenre, searched_genre, newMovie);
+                                                        insertMap(newUser->moviesByGenre, searched_genre, newCategory);
                                                 }
                                                 else
                                                 {
                                                         Par* searchData = searchMap(newUser->moviesByGenre, searched_genre);
                                                         movieCategory* genreInMap = searchData->value;
-                                                        //pushBack(genreInMap->movie_list, newMovie); no se qué pasa con el pushBack aquí
+                                                        pushBack(genreInMap->movie_list, newMovie);
                                                 }
                                                 searched_genre = nextList(newMovie->genres);
                                         }
@@ -476,7 +475,8 @@ void manualAdd(HashMap* globalMap, userType* user)
         printf("Movie ID: ");
         scanf("%[^\n]s", movie_id);
         getchar();
-        if (searchMap(user->movieMap, movie_id) != NULL) //<-- hay algo raro con el search
+        movieType* a = (movieType*) searchMap(user->movieMap, movie_id);
+        if (a != NULL)
         {
                 system("cls");
                 gotoxy(30, 4);
@@ -599,7 +599,7 @@ int main()
     HashMap* usersMap = createMap(30); //<-- así como veo, también veo más factible crear un mapa con los usuarios
     HashMap* globalMovieMap = createMap(30);
     char* loggedUserName = (char*) malloc (100*sizeof(char));
-    userType* loggedUser;
+    userType* loggedUser = createUser("a");
     char* movieID = (char*) malloc(100*sizeof(char)); //<-- Para recibir el ID de la pelicula a buscar en la función 2.
     
     login(loggedUserName, loggedUser, globalMovieMap, usersMap);
@@ -639,7 +639,7 @@ int main()
                         printf("Please enter the ID of the movie you are looking for: ");
                         scanf("%s", &movieID);
                         getchar();
-                        searchByID(globalMovieMap, movieID);
+                        //searchByID(globalMovieMap, movieID);
                         gotoxy(30,4);
                         printf("WORK IN PROGRESS!\n");
                         getch();
