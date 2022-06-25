@@ -606,6 +606,39 @@ void searchByID(HashMap* allMovies, char* ID){
           gotoxy(30,6);
           printf("Press any button to return to the main menu.");
         }
+        getch();
+}
+
+void showMovies(HashMap* allUsers, char* userName, userType* loggedUserInfo){
+        int option;
+        system("cls");
+        gotoxy(30, 2);
+        printf("(1) Show your own movies\n");
+        gotoxy(30,3);
+        printf("(2) Show movies from another user\n");
+        gotoxy(30,4);
+        printf("Select an option: ");
+        scanf("%i", &option);
+        getchar();
+
+        switch(option)
+        {
+                case 1: system("cls");
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!");
+                        getch();
+                        //showOwnMovies(loggedUserInfo, userName);
+                        break;
+
+                case 2: system("cls");
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!");
+                        getch();
+                        //showUserMovies(allUsers);
+                        break;
+        }
+
+
 }
 
 int main()
@@ -654,12 +687,10 @@ int main()
                         scanf("%s", movieID);
                         getchar();
                         searchByID(globalMovieMap, movieID);
-                        getch();
                         break;
                 case 3: system("cls");
                         gotoxy(30,4);
-                        printf("NOT IMPLEMENTED YET\n");
-                        getch();
+                        showMovies(usersMap, loggedUserName, loggedUser);
                         break;
                 case 4: system("cls");
                         gotoxy(30,4);
