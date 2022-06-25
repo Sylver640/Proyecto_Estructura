@@ -567,17 +567,21 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser) //tendría que pon
 
 void searchByID(HashMap* allMovies, char* ID){
         system("cls");
-        gotoxy(30,4);
-        printf("function successfully initialized!\n");
         Par* foundMovie = searchMap(allMovies, ID);
         gotoxy(30,4);
-        printf("Searching for movie...\n");
+        printf("Searching for the movie...");
+        Sleep(3000);
         if(foundMovie != NULL){
+            gotoxy(30,4);    
             printf("Your movie has been found!\n\n");    
             movieType* movieData = foundMovie->value;
-
-            printf("Title: %s\nID: %s\nYear: %d\n", movieData->movieName, movieData->movie_id, movieData->year);
-
+            gotoxy(30,5);
+            printf("Title: %s\n", movieData->movieName);
+            gotoxy(30,6);
+            printf("ID: %s\n", movieData->movie_id);
+            gotoxy(30,7);
+            printf("Year: %d\n", movieData->year);
+            gotoxy(30,8);
             char* genre = firstList(movieData->genres);
             printf("Genres: ");
             if(genre != NULL){
@@ -585,13 +589,23 @@ void searchByID(HashMap* allMovies, char* ID){
                   printf("%s, ", genre);
                   genre = nextList(movieData->genres);
                 }
-
+                printf(".");
             }
             printf("\n");
+            gotoxy(30,9);
+            printf("User Score: %d\n", movieData->userScore);
+            gotoxy(30,10);
+            printf("Runtime: %d minutes\n", movieData->runtime);
 
-            printf("User Score: %d\nRuntime: %d minutes", movieData->userScore, movieData->runtime);
+            gotoxy(30,12);
+            printf("Press any button to return to the main menu.");
 
-        }else printf("We are sorry, your movie could not be found.");
+        }else{
+          gotoxy(30,4);
+          printf("We are sorry, your movie could not be found.\n");
+          gotoxy(30,6);
+          printf("Press any button to return to the main menu.");
+        }
 }
 
 int main()
@@ -640,8 +654,6 @@ int main()
                         scanf("%s", movieID);
                         getchar();
                         searchByID(globalMovieMap, movieID);
-                        gotoxy(30,4);
-                        printf("WORK IN PROGRESS!\n");
                         getch();
                         break;
                 case 3: system("cls");
