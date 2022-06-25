@@ -637,7 +637,7 @@ int main()
                 case 2: system("cls");
                         gotoxy(30,4);
                         printf("Please enter the ID of the movie you are looking for: ");
-                        scanf("%s", &movieID);
+                        scanf("%s", movieID);
                         getchar();
                         searchByID(globalMovieMap, movieID);
                         gotoxy(30,4);
