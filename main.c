@@ -542,7 +542,27 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser) //tendría que pon
         }
         userType* otherUser = searched_result->value;
         
-        
+        Pair* firstRating = firstTreeMap(otherUser->ratingOrder);
+        movieCategory* firstMovieRating = firstRating->value;
+        //pushBack(firstMovieRating->movie_list, newMovie);
+        movieType* currentMovie = firstList(firstMovieRating->movie_list);
+        while (currentMovie != NULL)
+        {
+                printf("movie name: %s\n", currentMovie->movieName);
+                printf("movie ID: %s\n", currentMovie->movie_id);
+                printf("year of release: %d\n", currentMovie->year);
+                printf("movie genres: ");
+                char* currentGenre = firstList(currentMovie->genres);
+                while(currentGenre != NULL)
+                {
+                        printf("%s, ", currentGenre);
+                        currentGenre = nextList(currentMovie->genres);
+                }
+                printf("\n");
+                printf("user score: %d\n", currentMovie->userScore);
+                printf("runtime: %d\n", currentMovie->runtime);
+                currentMovie = nextList(firstMovieRating->movie_list);
+        }
 }
 
 void searchByID(HashMap* allMovies, char* ID){
