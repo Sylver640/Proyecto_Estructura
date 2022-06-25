@@ -639,7 +639,7 @@ int main()
                         printf("Please enter the ID of the movie you are looking for: ");
                         scanf("%s", &movieID);
                         getchar();
-                        //searchByID(globalMovieMap, movieID);
+                        searchByID(globalMovieMap, movieID);
                         gotoxy(30,4);
                         printf("WORK IN PROGRESS!\n");
                         getch();
