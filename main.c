@@ -534,7 +534,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser) //tendría que pon
         scanf("%[^\n]s", username);
         getchar();
 
-        Pair* searched_result = searchMap(usersMap, username);
+        Par* searched_result = searchMap(usersMap, username);
         if ( searched_result == NULL)
         {
                 printf("The user you are searching for does not exist.");
@@ -545,26 +545,33 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser) //tendría que pon
         
 }
 
-void searchByID(HashMap* allMovies, char ID){
+void searchByID(HashMap* allMovies, char* ID){
         system("cls");
-        /*Par* foundMovie = searchMap(allMovies, ID);
+        gotoxy(30,4);
+        printf("function successfully initialized!\n");
+        Par* foundMovie = searchMap(allMovies, ID);
+        gotoxy(30,4);
+        printf("Searching for movie...\n");
         if(foundMovie != NULL){
             printf("Your movie has been found!\n\n");    
             movieType* movieData = foundMovie->value;
 
             printf("Title: %s\nID: %s\nYear: %d\n", movieData->movieName, movieData->movie_id, movieData->year);
 
-            char genre = firstList(movieData->genres);
+            char* genre = firstList(movieData->genres);
             printf("Genres: ");
-            while(genre != NULL){
-                printf("%s, ", genre);
-                genre= nextList(movieData->genres);
+            if(genre != NULL){
+                while(genre != NULL){
+                  printf("%s, ", genre);
+                  genre = nextList(movieData->genres);
+                }
+
             }
             printf("\n");
 
             printf("User Score: %d\nRuntime: %d minutes", movieData->userScore, movieData->runtime);
 
-        }else printf("We are sorry, your movie could not be found.");*/
+        }else printf("We are sorry, your movie could not be found.");
 }
 
 int main()
@@ -573,7 +580,7 @@ int main()
     HashMap* globalMovieMap = createMap(30);
     char* loggedUserName = (char*) malloc (100*sizeof(char));
     userType* loggedUser;
-    char movieID; //<-- Para recibir el ID de la pelicula a buscar en la función 2.
+    char* movieID = (char*) malloc(100*sizeof(char)); //<-- Para recibir el ID de la pelicula a buscar en la función 2.
     
     login(loggedUserName, loggedUser, globalMovieMap, usersMap);
     addOtherUsers(loggedUserName, usersMap, globalMovieMap);
@@ -609,15 +616,17 @@ int main()
                         break;
                 case 2: system("cls");
                         gotoxy(30,4);
-                        printf("NOT IMPLEMENTED YET\n");
+                        printf("Please enter the ID of the movie you are looking for: ");
+                        scanf("%s", &movieID);
+                        getchar();
+                        searchByID(globalMovieMap, movieID);
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!\n");
                         getch();
                         break;
                 case 3: system("cls");
                         gotoxy(30,4);
-                        printf("Please enter the ID of the movie you are looking for: ");
-                        scanf("%s", &movieID);
-                        searchByID(globalMovieMap, movieID);
-                        printf("\n WORK IN PROGRESS!\n");
+                        printf("NOT IMPLEMENTED YET\n");
                         getch();
                         break;
                 case 4: system("cls");
