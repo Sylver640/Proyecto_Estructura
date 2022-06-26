@@ -256,7 +256,7 @@ void searchByID(HashMap* allMovies, char* ID){
             gotoxy(30,6);
             printf("ID: %s\n", movieData->movie_id);
             gotoxy(30,7);
-            printf("Year: %d\n", movieData->year);
+            printf("Year: %d\n", *movieData->year);
             gotoxy(30,8);
             char* genre = firstList(movieData->genres);
             printf("Genres: ");
@@ -269,9 +269,9 @@ void searchByID(HashMap* allMovies, char* ID){
             }
             printf("\n");
             gotoxy(30,9);
-            printf("User Score: %d\n", movieData->userScore);
+            printf("User Score: %d\n", *movieData->userScore);
             gotoxy(30,10);
-            printf("Runtime: %d minutes\n", movieData->runtime);
+            printf("Runtime: %d minutes\n", *movieData->runtime);
 
             gotoxy(30,12);
             printf("Press any button to return to the main menu.");
@@ -285,7 +285,27 @@ void searchByID(HashMap* allMovies, char* ID){
         getch();
 }
 
-void userMovies(userType* user_Info, char* user){
+void showMoviesThreeToSix(TreeMap* criteriaMap, char* user_Name){
+        //Empezar siempre en posicion minima (minimum())
+        //Mostrar datos de la pelicula y pasar a siguiente posicion.
+
+}
+
+void showMoviesGenre(HashMap* genreMap, char* user_Name){
+        //Pedir genero y hacer searchMap().
+        //Mostrar todas las peliculas de la lista de ese genero y su info.
+
+}
+
+void showMoviesInYear(TreeMap* criteriaMap, char* user_Name){
+        //Pedir año como rango.
+        //Buscar la posicion con key dicho año.
+        //Mostrar todas las peliculas de la lista de ese genero y su info.
+
+
+}
+
+void movieCriteria(userType* user_Info, char* user){
         int option;
         system("cls");
         gotoxy(30, 2);
@@ -308,44 +328,32 @@ void userMovies(userType* user_Info, char* user){
         switch(option)
         {
                 case 1: system("cls");
-                        gotoxy(30,4);
-                        printf("WORK IN PROGRESS!");
-                        getch();
+                        showMoviesGenre(user_Info->moviesByGenre, user);
                         break;
 
                 case 2: system("cls");
-                        gotoxy(30,4);
-                        printf("WORK IN PROGRESS!");
-                        getch();
+                        showMoviesInYear(user_Info->yearOrder, user);
                         break;
 
                 case 3: system("cls");
-                        gotoxy(30,4);
-                        printf("WORK IN PROGRESS!");
-                        getch();
+                        showMoviesThreeToSix(user_Info->ratingOrder, user);
                         break;
 
                 case 4: system("cls");
-                        gotoxy(30,4);
-                        printf("WORK IN PROGRESS!");
-                        getch();
+                        showMoviesThreeToSix(user_Info->abcOrder, user);
                         break;
 
                 case 5: system("cls");
-                        gotoxy(30,4);
-                        printf("WORK IN PROGRESS!");
-                        getch();
+                        showMoviesThreeToSix(user_Info->runtimeOrder, user);
                         break;
 
                 case 6: system("cls");
-                        gotoxy(30,4);
-                        printf("WORK IN PROGRESS!");
-                        getch();
+                        showMoviesThreeToSix(user_Info->yearOrder, user);
                         break;
         }
 }
 
-void showMovies(HashMap* allUsers, char* userName, userType* loggedUserInfo){
+void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){
         int option;
         char* user = (char*) malloc(100*sizeof(char));
         Par* foundUser; 
@@ -362,7 +370,7 @@ void showMovies(HashMap* allUsers, char* userName, userType* loggedUserInfo){
         switch(option)
         {
                 case 1: system("cls");
-                        userMovies(loggedUserInfo, userName);
+                        movieCriteria(loggedUserInfo, userName);
                         break;
 
                 case 2: system("cls");
@@ -379,7 +387,7 @@ void showMovies(HashMap* allUsers, char* userName, userType* loggedUserInfo){
                              printf("The user has been found!");
                              Sleep(2000);   
                              userType* userInfo = foundUser->value;
-                             userMovies(userInfo, user);
+                             movieCriteria(userInfo, user);
 
                         }else{
                            gotoxy(30,5);
@@ -441,7 +449,7 @@ int main()
                         break;
                 case 3: system("cls");
                         gotoxy(30,4);
-                        showMovies(usersMap, loggedUserName, loggedUser);
+                        userChoice(usersMap, loggedUserName, loggedUser);
                         break;
                 case 4: system("cls");
                         gotoxy(30,4);
