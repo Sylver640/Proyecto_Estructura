@@ -176,13 +176,28 @@ int calculateAffinity (userType* user1, userType* user2)
                 sumAffinity += affinity; //se suma la afinidad a la cantidad total de afinidad
                 currentMovieID = nextList(matchingMovies);
         }
+        if (numMovies == 0) return 0;
         int avgAffinity = sumAffinity / numMovies;
         return avgAffinity;
 }
 
 void userDiscovery (userType* loggedUser, HashMap* usersMap)
 {
-
+        printf("Searching for compatible users...\n");
+        Par* currentUserPair = firstMap(usersMap);
+        while (currentUserPair != NULL)
+        {
+                userType* currentUser = currentUserPair->value;
+                int affinity = calculateAffinity(loggedUser, currentUser);
+                if (affinity >= 75)
+                {
+                        printf("user name: %s\n", currentUser->user_id);
+                        printf("number of movies: %d\n", currentUser->movieNumber);
+                        printf("\n");
+                }
+                currentUserPair = nextMap(usersMap);
+        }
+        printf("Search finished.\n");
 }
 
 void searchByID(HashMap* allMovies, char* ID){
@@ -314,13 +329,11 @@ int main()
                         break;
                 case 4: system("cls");
                         gotoxy(30,4);
-                        printf("NOT IMPLEMENTED YET\n");
-                        getch();
+                        movieDiscovery(usersMap, loggedUser);
                         break;
                 case 5: system("cls");
                         gotoxy(30,4);
-                        printf("NOT IMPLEMENTED YET\n");
-                        getch();
+                        userDiscovery(loggedUser, usersMap);
                         break;
                 case 6: system("cls");
                         gotoxy(30,4);
