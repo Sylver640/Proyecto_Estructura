@@ -12,6 +12,90 @@
 #include "initialize.h"
 #include "datatypes.h"
 
+void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* year, char* score, char* runtime)
+{
+        insertMap(globalMap, movie->movie_id, movie);
+
+        if (searchMap(user->movieMap, movie->movie_id) != NULL)
+                return;
+
+        insertMap(user->movieMap, movie->movie_id, movie);
+                        
+        insertTreeMap(user->abcOrder, movie->movieName, movie);
+
+        if (searchTreeMap(user->yearOrder, movie->year) == NULL)
+        {
+                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                newCategory->name = (char*) malloc (100*sizeof(char));
+                strcpy(newCategory->name, year);
+                newCategory->movie_list = createList();
+                pushBack(newCategory->movie_list, movie);
+                insertTreeMap(user->yearOrder, movie->year, newCategory);
+        }
+        else
+        {
+                Pair* searchTreeMapData = searchTreeMap(user->yearOrder, movie->year);
+                movieCategory* yearSearched = searchTreeMapData->value;
+                pushBack(yearSearched->movie_list, movie);
+        }
+
+        char* searched_genre = firstList(movie->genres);
+        while (searched_genre != NULL)
+        {
+                if (searchMap(user->moviesByGenre, searched_genre) == NULL)
+                {
+                        movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                        newCategory->name = (char*) malloc (100*sizeof(char));
+                        strcpy(newCategory->name, searched_genre);
+                        newCategory->movie_list = createList();
+                        pushBack(newCategory->movie_list, movie);
+                        insertMap(user->moviesByGenre, searched_genre, newCategory);
+                }
+                else
+                {
+                        Par* searchData = searchMap(user->moviesByGenre, searched_genre);
+                        movieCategory* genreInMap = searchData->value;
+                        pushBack(genreInMap->movie_list, movie);
+                }
+                searched_genre = nextList(movie->genres);
+        }
+
+        if (searchTreeMap(user->runtimeOrder, movie->runtime) == NULL)
+        {
+                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                newCategory->name = (char*) malloc (100*sizeof(char));
+                strcpy(newCategory->name, runtime);
+                newCategory->movie_list = createList();
+                pushBack(newCategory->movie_list, movie);
+                insertTreeMap(user->runtimeOrder, movie->runtime, newCategory);
+        }
+        else
+        {
+                Pair* searchTreeMapData = searchTreeMap(user->runtimeOrder, movie->runtime);
+                movieCategory* runtimeSearched = searchTreeMapData->value;
+                pushBack(runtimeSearched->movie_list, movie);
+        }
+                        
+        if (searchTreeMap(user->ratingOrder, movie->userScore) == NULL)
+        {
+                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
+                newCategory->name = (char*) malloc (100*sizeof(char));
+                strcpy(newCategory->name, score);
+                newCategory->movie_list = createList();
+                pushBack(newCategory->movie_list, movie);
+                insertTreeMap(user->ratingOrder, movie->userScore, newCategory);
+        }
+        else
+        {
+                Pair* searchTreeMapData = searchTreeMap(user->ratingOrder, movie->userScore);
+                movieCategory* ratingSearched = searchTreeMapData->value;
+                pushBack(ratingSearched->movie_list, movie);
+        }
+        user->movieNumber++;
+        
+}
+
+
 void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashMap* usersMap)
 {
         char path[100];
@@ -37,7 +121,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                 return;
         }
 
-        //loggedUser = createUser(username);
+        assignUserName(loggedUser, username);
 
         char linea[1024];
         int i;
@@ -70,85 +154,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                         int scoreToNumber = atoi(userScore);
                         *newMovie->userScore = scoreToNumber;
 
-                        insertMap(globalMovieMap, movie_id, newMovie);
-
-                        if (searchMap(loggedUser->movieMap, movie_id) != NULL)
-                                continue;
-
-                        insertMap(loggedUser->movieMap, movie_id, newMovie);
-                        
-                        insertTreeMap(loggedUser->abcOrder, newMovie->movieName, newMovie);
-
-                        if (searchTreeMap(loggedUser->yearOrder, newMovie->year) == NULL)
-                        {
-                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
-                                newCategory->name = (char*) malloc (100*sizeof(char));
-                                strcpy(newCategory->name, movieYear);
-                                newCategory->movie_list = createList();
-                                pushBack(newCategory->movie_list, newMovie);
-                                insertTreeMap(loggedUser->yearOrder, newMovie->year, newCategory);
-                        }
-                        else
-                        {
-                                searchTreeMapData = searchTreeMap(loggedUser->yearOrder, newMovie->year);
-                                movieCategory* yearSearched = searchTreeMapData->value;
-                                pushBack(yearSearched->movie_list, newMovie);
-                        }
-
-                        char* searched_genre = firstList(newMovie->genres);
-                        while (searched_genre != NULL)
-                        {
-                                if (searchMap(loggedUser->moviesByGenre, searched_genre) == NULL)
-                                {
-                                        movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
-                                        newCategory->name = (char*) malloc (100*sizeof(char));
-                                        strcpy(newCategory->name, searched_genre);
-                                        newCategory->movie_list = createList();
-                                        pushBack(newCategory->movie_list, newMovie);
-                                        insertMap(loggedUser->moviesByGenre, searched_genre, newCategory);
-                                }
-                                else
-                                {
-                                        Par* searchData = searchMap(loggedUser->moviesByGenre, searched_genre);
-                                        movieCategory* genreInMap = searchData->value;
-                                        pushBack(genreInMap->movie_list, newMovie);
-                                }
-                                searched_genre = nextList(newMovie->genres);
-                        }
-
-                        if (searchTreeMap(loggedUser->runtimeOrder, newMovie->runtime) == NULL)
-                        {
-                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
-                                newCategory->name = (char*) malloc (100*sizeof(char));
-                                strcpy(newCategory->name, runtime);
-                                newCategory->movie_list = createList();
-                                pushBack(newCategory->movie_list, newMovie);
-                                insertTreeMap(loggedUser->runtimeOrder, newMovie->runtime, newCategory);
-                        }
-                        else
-                        {
-                                searchTreeMapData = searchTreeMap(loggedUser->runtimeOrder, newMovie->runtime);
-                                movieCategory* runtimeSearched = searchTreeMapData->value;
-                                pushBack(runtimeSearched->movie_list, newMovie);
-                        }
-                        
-
-                        if (searchTreeMap(loggedUser->ratingOrder, newMovie->userScore) == NULL)
-                        {
-                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
-                                newCategory->name = (char*) malloc (100*sizeof(char));
-                                strcpy(newCategory->name, userScore);
-                                newCategory->movie_list = createList();
-                                pushBack(newCategory->movie_list, newMovie);
-                                insertTreeMap(loggedUser->ratingOrder, newMovie->userScore, newCategory);
-                        }
-                        else
-                        {
-                                searchTreeMapData = searchTreeMap(loggedUser->ratingOrder, newMovie->userScore);
-                                movieCategory* ratingSearched = searchTreeMapData->value;
-                                pushBack(ratingSearched->movie_list, newMovie);
-                        }
-                        loggedUser->movieNumber++;
+                        insertMovie(globalMovieMap, newMovie, loggedUser, movieYear, userScore, runtime);
                 }
         }
 
@@ -184,7 +190,8 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                                         newuser_username[i] = dir->d_name[i];
                         } else continue;
 
-                        userType* newUser = createUser(newuser_username);
+                        userType* newUser = createUser();
+                        assignUserName(newUser, newuser_username);
                         
                         char linea[1024];
                         int k;
@@ -218,84 +225,7 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                                         int scoreToNumber = atoi(userScore);
                                         *newMovie->userScore = scoreToNumber;
 
-                                        insertMap(globalMovieMap, movie_id, newMovie);
-
-                                        if (searchMap(newUser->movieMap, movie_id) != NULL)
-                                                continue;
-                                        
-                                        //aquí tendría que modularizar más esta parte => osea hacer una función que haga todo lo de abajo
-                                        insertMap(newUser->movieMap, movie_id, newMovie);
-                                        insertTreeMap(newUser->abcOrder, newMovie->movieName, newMovie);
-
-                                        if (searchTreeMap(newUser->yearOrder, newMovie->year) == NULL)
-                                        {
-                                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
-                                                newCategory->name = (char*) malloc (100*sizeof(char));
-                                                strcpy(newCategory->name, movieYear);
-                                                newCategory->movie_list = createList();
-                                                pushBack(newCategory->movie_list, newMovie);
-                                                insertTreeMap(newUser->yearOrder, newMovie->year, newCategory);
-                                        }
-                                        else
-                                        {
-                                                searchData = searchTreeMap(newUser->yearOrder, newMovie->year);
-                                                movieCategory* yearSearched = searchData->value;
-                                                pushBack(yearSearched->movie_list, newMovie);
-                                        }
-                                        char* searched_genre = firstList(newMovie->genres);
-                                        while (searched_genre != NULL)
-                                        {
-                                                if (searchMap(newUser->moviesByGenre, searched_genre) == NULL)
-                                                {
-                                                        movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
-                                                        newCategory->name = (char*) malloc (100*sizeof(char));
-                                                        strcpy(newCategory->name, searched_genre);
-                                                        newCategory->movie_list = createList();
-                                                        pushBack(newCategory->movie_list, newMovie);
-                                                        insertMap(newUser->moviesByGenre, searched_genre, newCategory);
-                                                }
-                                                else
-                                                {
-                                                        Par* searchData = searchMap(newUser->moviesByGenre, searched_genre);
-                                                        movieCategory* genreInMap = searchData->value;
-                                                        pushBack(genreInMap->movie_list, newMovie);
-                                                }
-                                                searched_genre = nextList(newMovie->genres);
-                                        }
-
-                                        if (searchTreeMap(newUser->runtimeOrder, newMovie->runtime) == NULL)
-                                        {
-                                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
-                                                newCategory->name = (char*) malloc (100*sizeof(char));
-                                                strcpy(newCategory->name, runtime);
-                                                newCategory->movie_list = createList();
-                                                pushBack(newCategory->movie_list, newMovie);
-                                                insertTreeMap(newUser->runtimeOrder, newMovie->runtime, newCategory);
-                                        }
-                                        else
-                                        {
-                                                searchData = searchTreeMap(newUser->runtimeOrder, newMovie->runtime);
-                                                movieCategory* runtimeSearched = searchData->value;
-                                                pushBack(runtimeSearched->movie_list, newMovie);
-                                        }
-                                        
-
-                                        if (searchTreeMap(newUser->ratingOrder, newMovie->userScore) == NULL)
-                                        {
-                                                movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
-                                                newCategory->name = (char*) malloc (100*sizeof(char));
-                                                strcpy(newCategory->name, userScore);
-                                                newCategory->movie_list = createList();
-                                                pushBack(newCategory->movie_list, newMovie);
-                                                insertTreeMap(newUser->ratingOrder, newMovie->userScore, newCategory);
-                                        }
-                                        else
-                                        {
-                                                searchData = searchTreeMap(newUser->ratingOrder, newMovie->userScore);
-                                                movieCategory* ratingSearched = searchData->value;
-                                                pushBack(ratingSearched->movie_list, newMovie);
-                                        }
-                                        newUser->movieNumber++;
+                                        insertMovie(globalMovieMap, newMovie, newUser, movieYear, userScore, runtime);
                                 }
                         }
 
@@ -303,7 +233,6 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                         
                         memset(newuser_username,0,sizeof(newuser_username));
                         fclose(f);
-                        
                 }
         }
 

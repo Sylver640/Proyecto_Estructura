@@ -43,11 +43,10 @@ int lower_than_int(void * key1, void * key2) {
     return 0;
 }
 
-userType* createUser(char* username)
+userType* createUser()
 {
         userType* newUser = (userType*) malloc (sizeof(userType));
         newUser->user_id = (char*) malloc (100*sizeof(char));
-        strcpy(newUser->user_id, username);
         newUser->movieNumber = 0;
         newUser->movieMap = createMap(20);
         newUser->abcOrder = createTreeMap(lower_than_string);
@@ -67,4 +66,11 @@ movieType* createMovie()
         new->genres = createList();
         new->runtime = (int*) malloc (sizeof(int));
         new->userScore = (int*) malloc (sizeof(int));
+}
+
+void assignUserName(userType* user, char* username)
+{
+  //se asegura que el usuario ya va a estar creado
+  if (user == NULL) return;
+  strcpy(user->user_id, username);
 }
