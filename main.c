@@ -30,29 +30,70 @@ void manualAdd(HashMap* globalMap, userType* user)
         
         movieType* newMovie = createMovie();
         char* movie_id = (char*) malloc (100*sizeof(char));
+        char* genres = (char*) malloc (100*sizeof(char));
         gotoxy(30, 2);
         printf("We need some information first...\n");
 
         gotoxy(29, 3);
-        printf("Movie ID: ");
-        scanf("%[^\n]s", movie_id);
+        printf("ID: ");
+        scanf("%[^\n]s", newMovie->movie_id);
         getchar();
-        movieType* a = (movieType*) searchMap(user->movieMap, movie_id);
-        if (a != NULL)
+        Par* search = searchMap(user->movieMap, newMovie->movie_id);
+        if (search != NULL)
         {
+                movieType* movieData = search->value;
                 system("cls");
                 gotoxy(30, 4);
                 printf("You already added this movie!\n");
+                gotoxy(30,5);
+                printf("ID: %s\n", movieData->movie_id);
+                gotoxy(30,6);
+                printf("Name: %s\n", movieData->movieName);
+                gotoxy(30,7);
+                printf("Year: %d\n", *movieData->year);
+                gotoxy(30,8);
+                char* genre = firstList(movieData->genres);
+                printf("Genres: %s", genre);
+                while (genre != NULL)
+                {
+                        printf(", %s", genre);
+                        genre = nextList(movieData->genres);
+                }
+                gotoxy(30,9);
+                printf("Runtime (in minutes): %d\n", *movieData->runtime);
+                gotoxy(30,10);
+                printf("Your Rating: %d\n", *movieData->userScore);
+                getch();
                 return;
         }
         gotoxy(29, 4);
         printf("Name: ");
         scanf("%[^\n]s", newMovie->movieName);
         getchar();
-
-
+        gotoxy(29, 5);
+        printf("Year: ");
+        scanf("%d", newMovie->year);
+        getchar();
+        char* string_year = (char*) malloc (20*sizeof(char));
+        sprintf(string_year, "%d", newMovie->year);
+        gotoxy(29,6);
+        printf("Genres (separated by commas): ");
+        scanf("%[^\n]s", genres);
+        split_and_AddGenres(genres, newMovie);
+        gotoxy(29, 7);
+        printf("Runtime (in minutes): ");
+        scanf("%d", newMovie->runtime);
+        getchar();
+        char* string_runtime = (char*) malloc (20*sizeof(char));
+        sprintf(string_runtime, "%d", newMovie->runtime);
+        gotoxy(29, 8);
+        printf("Your Rating (from 1 to 10): ");
+        scanf("%d", newMovie->userScore);
+        getchar();
+        char* string_rating = (char*) malloc (20*sizeof(char));
+        sprintf(string_rating, "%d", newMovie->userScore);
+        insertMovie(globalMap, newMovie, user, string_year, string_rating, string_runtime);
         getch();
-        return;
 }
 
 void import_csv(HashMap* globalMap, userType* user)
