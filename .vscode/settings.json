@@ -3,6 +3,7 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "windows.h": "c",
-        "type_traits": "c"
+        "type_traits": "c",
+        "treemap.h": "c"
     }
 }
