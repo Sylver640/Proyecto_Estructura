@@ -524,9 +524,15 @@ void addMovies(HashMap* globalMap, userType* user)
 
 }
 
+//función para ver si una película ha sido vista por logged user
 movieType* searchMovieUserList(userType* loggedUser, char* movie_id) //TO DO
 {
-
+        Par* searchResult = searchMap(loggedUser->movieMap, movie_id);
+        if (searchResult != NULL)
+        {
+                movieType* foundMovie = searchResult->value;
+                return foundMovie;
+        } 
         return NULL;
 }
 
@@ -551,24 +557,23 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         while (currentMovie != NULL)
         {
                 //saltar peliculas ya vistas por el usuario
-                if (searchMovieUserList(loggedUser, currentMovie->movie_id) != NULL)
+                if (searchMovieUserList(loggedUser, currentMovie->movie_id) == NULL)
                 {
-                        continue;
+                        //película no ha sido vista, se recomienda a logged user
+                        printf("movie name: %s\n", currentMovie->movieName);
+                        printf("movie ID: %s\n", currentMovie->movie_id);
+                        printf("year of release: %d\n", currentMovie->year);
+                        printf("movie genres: ");
+                        char* currentGenre = firstList(currentMovie->genres);
+                        while(currentGenre != NULL)
+                        {
+                                printf("%s, ", currentGenre);
+                                currentGenre = nextList(currentMovie->genres);
+                        }
+                        printf("\n");
+                        printf("user score: %d\n", currentMovie->userScore);
+                        printf("runtime: %d\n", currentMovie->runtime);
                 }
-
-                printf("movie name: %s\n", currentMovie->movieName);
-                printf("movie ID: %s\n", currentMovie->movie_id);
-                printf("year of release: %d\n", currentMovie->year);
-                printf("movie genres: ");
-                char* currentGenre = firstList(currentMovie->genres);
-                while(currentGenre != NULL)
-                {
-                        printf("%s, ", currentGenre);
-                        currentGenre = nextList(currentMovie->genres);
-                }
-                printf("\n");
-                printf("user score: %d\n", currentMovie->userScore);
-                printf("runtime: %d\n", currentMovie->runtime);
                 currentMovie = nextList(firstMovieRating->movie_list);
         }
 }
