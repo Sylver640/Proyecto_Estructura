@@ -87,9 +87,9 @@ void addMovies(HashMap* globalMap, userType* user)
 }
 
 //función para ver si una película ha sido vista por logged user
-movieType* searchMovieUserList(userType* loggedUser, char* movie_id) //TO DO
+movieType* searchMovieUserList(userType* user, char* movie_id) 
 {
-        Par* searchResult = searchMap(loggedUser->movieMap, movie_id);
+        Par* searchResult = searchMap(user->movieMap, movie_id);
         if (searchResult != NULL)
         {
                 movieType* foundMovie = searchResult->value;
@@ -138,6 +138,51 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                 }
                 currentMovie = nextList(firstMovieRating->movie_list);
         }
+}
+
+List* findAllMatchingMovies (userType* user1, userType* user2)
+{
+        List* matchingMovies = createList();
+        Par* currentMoviePair = firstMap(user1->movieMap);
+        while (currentMoviePair != NULL)
+        {
+                movieType* foundMovie = searchMovieUserList(user2, currentMoviePair->key);
+                if (foundMovie != NULL)
+                {
+                        pushBack(matchingMovies, foundMovie->movie_id);
+                }
+                currentMoviePair = nextMap(user1->movieMap);
+        }
+        return matchingMovies;
+}
+
+int calculateAffinity (userType* user1, userType* user2)
+{
+        int sumAffinity = 0; //suma de afinidades, dividida al final por la cantidad de peliculas
+        int numMovies = 0; //cantidad de peliculas
+        List* matchingMovies = findAllMatchingMovies(user1, user2);
+        char* currentMovieID = firstList(matchingMovies);
+        while (currentMovieID != NULL)
+        {
+                numMovies++;
+                movieType* movie1 = searchMovieUserList(user1, currentMovieID);
+                movieType* movie2 = searchMovieUserList(user2, currentMovieID);
+                int score1 = *(movie1->userScore);
+                int score2 = *(movie2->userScore);
+
+                //calculo afinidad, afinidad es un porcentaje que va de 0 a 100
+                //100 siendo la misma nota, y 1 cuando las notas son los extremos opuestos
+                int affinity = 100 - (score1-score2)*11; 
+                sumAffinity += affinity; //se suma la afinidad a la cantidad total de afinidad
+                currentMovieID = nextList(matchingMovies);
+        }
+        int avgAffinity = sumAffinity / numMovies;
+        return avgAffinity;
+}
+
+void userDiscovery (userType* loggedUser, HashMap* usersMap)
+{
+
 }
 
 void searchByID(HashMap* allMovies, char* ID){
