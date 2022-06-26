@@ -524,11 +524,14 @@ void addMovies(HashMap* globalMap, userType* user)
 
 }
 
-void movieDiscovery (HashMap* usersMap, userType* loggedUser) //tendría que poner movie list para la búsqueda por género?
+movieType* searchMovieUserList(userType* loggedUser, char* movie_id) //TO DO
 {
-        //recomendar películas según coincidencia de películas favoritas con algún usuario (definir número), y recomendar películas que el usuario 
-        //no haya visto pero si el usuario que encontramos con afinidad
-        //si eso no funciona, hacer el mismo estilo de búsqueda pero con géneros
+
+        return NULL;
+}
+
+void movieDiscovery (HashMap* usersMap, userType* loggedUser)
+{
         char username[100];
         printf("Enter other username for comparison: ");
         scanf("%[^\n]s", username);
@@ -544,10 +547,15 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser) //tendría que pon
         
         Pair* firstRating = firstTreeMap(otherUser->ratingOrder);
         movieCategory* firstMovieRating = firstRating->value;
-        //pushBack(firstMovieRating->movie_list, newMovie);
         movieType* currentMovie = firstList(firstMovieRating->movie_list);
         while (currentMovie != NULL)
         {
+                //saltar peliculas ya vistas por el usuario
+                if (searchMovieUserList(loggedUser, currentMovie->movie_id) != NULL)
+                {
+                        continue;
+                }
+
                 printf("movie name: %s\n", currentMovie->movieName);
                 printf("movie ID: %s\n", currentMovie->movie_id);
                 printf("year of release: %d\n", currentMovie->year);
