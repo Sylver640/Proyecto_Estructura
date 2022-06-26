@@ -244,8 +244,70 @@ void searchByID(HashMap* allMovies, char* ID){
         getch();
 }
 
+void userMovies(userType* user_Info, char* user){
+        int option;
+        system("cls");
+        gotoxy(30, 2);
+        printf("(1) By Genre\n");
+        gotoxy(30,3);
+        printf("(2) By Year\n");
+        gotoxy(30,4);
+        printf("(3) By Rating\n");
+        gotoxy(30,5);
+        printf("(4) By Title\n");
+        gotoxy(30,6);
+        printf("(5) By Runtime\n");
+        gotoxy(30,7);
+        printf("(6) By Release Date\n");
+        gotoxy(30,8);
+        printf("Select a criteria: ");
+        scanf("%i", &option);
+        getchar();
+
+        switch(option)
+        {
+                case 1: system("cls");
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!");
+                        getch();
+                        break;
+
+                case 2: system("cls");
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!");
+                        getch();
+                        break;
+
+                case 3: system("cls");
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!");
+                        getch();
+                        break;
+
+                case 4: system("cls");
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!");
+                        getch();
+                        break;
+
+                case 5: system("cls");
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!");
+                        getch();
+                        break;
+                        
+                case 6: system("cls");
+                        gotoxy(30,4);
+                        printf("WORK IN PROGRESS!");
+                        getch();
+                        break;
+        }
+}
+
 void showMovies(HashMap* allUsers, char* userName, userType* loggedUserInfo){
         int option;
+        char* user = (char*) malloc(100*sizeof(char));
+        Par* foundUser; 
         system("cls");
         gotoxy(30, 2);
         printf("(1) Show your own movies\n");
@@ -259,21 +321,34 @@ void showMovies(HashMap* allUsers, char* userName, userType* loggedUserInfo){
         switch(option)
         {
                 case 1: system("cls");
-                        gotoxy(30,4);
-                        printf("WORK IN PROGRESS!");
-                        getch();
-                        //showOwnMovies(loggedUserInfo, userName);
+                        userMovies(loggedUserInfo, userName);
                         break;
 
                 case 2: system("cls");
                         gotoxy(30,4);
-                        printf("WORK IN PROGRESS!");
-                        getch();
-                        //showUserMovies(allUsers);
+                        printf("Please enter the user you're looking for: ");
+                        scanf("%s", user);
+                        system("cls");
+                        gotoxy(30,4);
+                        printf("Searching for your user...");
+                        Sleep(3000);
+                        foundUser = searchMap(allUsers, user);
+                        if(foundUser != NULL){
+                             gotoxy(30,5);
+                             printf("The user has been found!");
+                             Sleep(2000);   
+                             userType* userInfo = foundUser->value;
+                             userMovies(userInfo, user);
+
+                        }else{
+                           gotoxy(30,5);
+                           printf("The user has not been found.");
+                           gotoxy(30,7);
+                           printf("Press any button to return to the main menu.");
+                           getch();
+                        }
                         break;
         }
-
-
 }
 
 int main()
