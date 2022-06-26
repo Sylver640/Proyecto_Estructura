@@ -295,7 +295,7 @@ void userMovies(userType* user_Info, char* user){
                         printf("WORK IN PROGRESS!");
                         getch();
                         break;
-                        
+
                 case 6: system("cls");
                         gotoxy(30,4);
                         printf("WORK IN PROGRESS!");
@@ -417,7 +417,7 @@ int main()
                         break;
                 case 0: system("cls");
                         centerText("See you later :)", 5);
-                        getch();
+                        Sleep(2000);
                         system("cls");
                         return 0;
         }
