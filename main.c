@@ -155,6 +155,9 @@ void import_csv(HashMap* globalMap, userType* user)
                         strncpy(movie_id, csv_id+2, strlen(csv_id));
                         strcpy(newMovie->movie_id, movie_id);
 
+                        if (searchMap(user->movieMap, movie_id) != NULL)
+                                continue;
+
                         char* movieName = get_csv_field(linea, i+3);
                         strcpy(newMovie->movieName, movieName);
 
