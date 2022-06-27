@@ -12,6 +12,37 @@
 #include "initialize.h"
 #include "datatypes.h"
 
+void exportMovie(movieType* movie, char* username, char* year, char* runtime, char* score)
+{
+        char path[100];
+        snprintf(path, sizeof(path), "users/%s.csv", username);
+        FILE* f = fopen(path, "at");
+        fputs(movie->movie_id, f);
+        fputc(',', f);
+        fputs(movie->movieName, f);
+        fputc(',', f);
+        fputs(year, f);
+        fputc(',', f);
+        fputc('"', f);
+        char* genre = firstList(movie->genres);
+        fputs(genre, f);
+        while (genre != NULL)
+        {
+                fputc(',', f);
+                genre = nextList(movie->genres);
+                fputs(genre, f);
+        }
+        fputc('"', f);
+        fputc(',', f);
+        fputs(runtime, f);
+        fputc(',', f);
+        fputs(score, f);
+        fputc('\n', f);
+
+        fclose(f);
+
+}
+
 void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* year, char* score, char* runtime)
 {
         insertMap(globalMap, movie->movie_id, movie);
@@ -92,8 +123,6 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 pushBack(ratingSearched->movie_list, movie);
         }
         user->movieNumber++;
-
-        //exportMovie();
         
 }
 
@@ -120,6 +149,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                 printf("Creating it now...\n");
                 getch();
                 f = fopen(path, "wt");
+                fclose(f);
                 return;
         }
 

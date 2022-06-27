@@ -1,8 +1,3 @@
-/*
-COMENTARIOS:
-- Promediar cada película según un usuario la vaya agregando
-*/
-
 #include <stdio.h>
 #include <conio.h>
 #include <stdlib.h>
@@ -64,10 +59,12 @@ void manualAdd(HashMap* globalMap, userType* user)
                 getch();
                 return;
         }
+        
         gotoxy(29, 4);
         printf("Name: ");
         scanf("%[^\n]s", newMovie->movieName);
         getchar();
+        
         gotoxy(29, 5);
         printf("Year: ");
         scanf("%d", newMovie->year);
@@ -75,22 +72,35 @@ void manualAdd(HashMap* globalMap, userType* user)
         char* string_year = (char*) malloc (20*sizeof(char));
         sprintf(string_year, "%d", newMovie->year);
         gotoxy(29,6);
+        
         printf("Genres (separated by commas): ");
         scanf("%[^\n]s", genres);
         split_and_AddGenres(genres, newMovie);
         gotoxy(29, 7);
+        
         printf("Runtime (in minutes): ");
         scanf("%d", newMovie->runtime);
         getchar();
         char* string_runtime = (char*) malloc (20*sizeof(char));
         sprintf(string_runtime, "%d", newMovie->runtime);
+        
         gotoxy(29, 8);
         printf("Your Rating (from 1 to 10): ");
         scanf("%d", newMovie->userScore);
         getchar();
         char* string_rating = (char*) malloc (20*sizeof(char));
         sprintf(string_rating, "%d", newMovie->userScore);
+        
         insertMovie(globalMap, newMovie, user, string_year, string_rating, string_runtime);
+
+        char path[100];
+        snprintf(path, sizeof(path), "users/%s.csv", user->user_id);
+        FILE* userfile = fopen(path, "at");
+        fputc('\n', userfile);
+        fclose(userfile);
+
+        exportMovie(newMovie, user->user_id, string_year, string_runtime, string_rating);
+        
         getch();
 }
 
@@ -119,6 +129,12 @@ void import_csv(HashMap* globalMap, userType* user)
         getch();
 
         system("cls");
+
+        char path[100];
+        snprintf(path, sizeof(path), "users/%s.csv", user->user_id);
+        FILE* userfile = fopen(path, "at");
+        fputc('\n', userfile);
+        fclose(userfile);
 
         char linea[1024];
         int i;
@@ -161,6 +177,7 @@ void import_csv(HashMap* globalMap, userType* user)
                                 processedMovies++;
 
                         insertMovie(globalMap, newMovie, user, movieYear, userScore, runtime);
+                        exportMovie(newMovie, user->user_id, movieYear, runtime, userScore);
                 }
         }
 
@@ -470,19 +487,40 @@ void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){
         }
 }
 
+void showProfiles(HashMap* usersMap, userType* loggedUser)
+{
+        int option;
+        system("cls");
+        gotoxy(30, 2);
+        printf("(1) Your Profile\n");
+        gotoxy(30,3);
+        printf("(2) Search for another user's profile\n");
+        gotoxy(30,4);
+        printf("Select an option: ");
+        scanf("%i", &option);
+        getchar();
+        
+        switch(option)
+        {
+                case 1: //loggedProfile(loggedUser);
+                        break;
+                case 2: //userProfile(usersMap);
+                        break;
+        }
+}
+
 int main()
 {
-    HashMap* usersMap = createMap(30); //<-- así como veo, también veo más factible crear un mapa con los usuarios
+    HashMap* usersMap = createMap(30);
     HashMap* globalMovieMap = createMap(30);
     char* loggedUserName = (char*) malloc (100*sizeof(char));
-    userType* loggedUser = createUser("a");
+    userType* loggedUser = createUser();
     char* movieID = (char*) malloc(100*sizeof(char)); //<-- Para recibir el ID de la pelicula a buscar en la función 2.
     
     login(loggedUserName, loggedUser, globalMovieMap, usersMap);
     addOtherUsers(loggedUserName, usersMap, globalMovieMap);
     
     int option;
-    //MENÚ PROVISORIO
     while (1)
     {
         system("cls");
@@ -529,10 +567,7 @@ int main()
                         gotoxy(30,4);
                         userDiscovery(loggedUser, usersMap);
                         break;
-                case 6: system("cls");
-                        gotoxy(30,4);
-                        printf("NOT IMPLEMENTED YET\n");
-                        getch();
+                case 6: showProfiles(usersMap, loggedUser);
                         break;
                 case 0: system("cls");
                         centerText("See you later :)", 5);

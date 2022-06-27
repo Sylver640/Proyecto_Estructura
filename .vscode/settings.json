@@ -4,6 +4,7 @@
         "stdlib.h": "c",
         "windows.h": "c",
         "type_traits": "c",
-        "treemap.h": "c"
+        "treemap.h": "c",
+        "datatypes.h": "c"
     }
 }
