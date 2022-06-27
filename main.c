@@ -22,8 +22,6 @@ COMENTARIOS:
 #include "include/datatypes.h"
 #include "include/initialize.h"
 
-//al terminar cada función de añadir, recordar actualizar el csv del usuario
-
 void manualAdd(HashMap* globalMap, userType* user)
 {
         system("cls");
@@ -99,9 +97,80 @@ void manualAdd(HashMap* globalMap, userType* user)
 void import_csv(HashMap* globalMap, userType* user)
 {
         system("cls");
-
+        gotoxy(30,4);
+        printf("Checking for \"ratings.csv\" file...\n");
         getch();
-        return;
+
+        if (fileExists("ratings.csv") == 0)
+        {
+                gotoxy(30, 5);
+                printf("File not found!\n");
+                gotoxy(30, 6);
+                printf("Make sure the file is in the same place as the executable.\n");
+                getch();
+                return;
+        }
+
+        FILE* f = fopen("ratings.csv", "rt");
+        gotoxy(30,5);
+        printf("File opened!\n");
+        gotoxy(30,6);
+        printf("Press any key to process your movies.\n");
+        getch();
+
+        system("cls");
+
+        char linea[1024];
+        int i;
+        long processedMovies = 0;
+
+        fgets(linea, 1023, f);
+        while (fgets(linea, 1023, f) != NULL)
+        {
+                for (i = 0; i < 1; i++)
+                {
+                        char* check = get_csv_field(linea, i+5);
+                        if (strcmp(check, "movie") != 0)
+                                continue;
+                        movieType* newMovie = createMovie();
+                        
+                        char* csv_id = get_csv_field(linea, i);
+                        char* movie_id = (char*) malloc (100*sizeof(char));
+                        strncpy(movie_id, csv_id+2, strlen(csv_id));
+                        strcpy(newMovie->movie_id, movie_id);
+
+                        char* movieName = get_csv_field(linea, i+3);
+                        strcpy(newMovie->movieName, movieName);
+
+                        char* movieYear = get_csv_field(linea, i+8);
+                        int yearToNumber = atoi(movieYear);
+                        *newMovie->year = yearToNumber;
+
+                        char* genres = get_csv_field(linea, i+9);
+                        split_and_AddGenres(genres, newMovie);
+
+                        char* runtime = get_csv_field(linea, i+7);
+                        int runtimeToNumber = atoi(runtime);
+                        *newMovie->runtime = runtimeToNumber;
+
+                        char* userScore = get_csv_field(linea, i+1);
+                        int scoreToNumber = atoi (userScore);
+                        *newMovie->userScore = scoreToNumber;
+
+                        if (searchMap(user->movieMap, movie_id) == NULL)
+                                processedMovies++;
+
+                        insertMovie(globalMap, newMovie, user, movieYear, userScore, runtime);
+                }
+        }
+
+        gotoxy(30, 3);
+        printf("%ld movies were added to your profile.\n", processedMovies);
+        gotoxy(30, 5);
+        printf("Press any key to return to the main menu.");
+
+        fclose(f);
+        getch();
 }
 
 void addMovies(HashMap* globalMap, userType* user)
@@ -249,16 +318,16 @@ void searchByID(HashMap* allMovies, char* ID){
         printf("Searching for the movie...");
         Sleep(3000);
         if(foundMovie != NULL){
-            gotoxy(30,4);    
+            gotoxy(30,1);    
             printf("Your movie has been found!\n\n");    
             movieType* movieData = foundMovie->value;
-            gotoxy(30,5);
+            gotoxy(30,3);
             printf("Title: %s\n", movieData->movieName);
-            gotoxy(30,6);
+            gotoxy(30,4);
             printf("ID: %s\n", movieData->movie_id);
-            gotoxy(30,7);
+            gotoxy(30,5);
             printf("Year: %d\n", *movieData->year);
-            gotoxy(30,8);
+            gotoxy(30,6);
             char* genre = firstList(movieData->genres);
             printf("Genres: ");
             if(genre != NULL){
@@ -269,12 +338,12 @@ void searchByID(HashMap* allMovies, char* ID){
                 printf(".");
             }
             printf("\n");
-            gotoxy(30,9);
+            gotoxy(30,7);
             printf("User Score: %d\n", *movieData->userScore);
-            gotoxy(30,10);
+            gotoxy(30,8);
             printf("Runtime: %d minutes\n", *movieData->runtime);
 
-            gotoxy(30,12);
+            gotoxy(30,10);
             printf("Press any button to return to the main menu.");
 
         }else{

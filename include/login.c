@@ -92,6 +92,8 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 pushBack(ratingSearched->movie_list, movie);
         }
         user->movieNumber++;
+
+        //exportMovie();
         
 }
 
@@ -125,7 +127,6 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
 
         char linea[1024];
         int i;
-        Pair* searchTreeMapData;
 
         while (fgets(linea, 1023, f) != NULL)
         {

@@ -58,3 +58,14 @@ void split_and_AddGenres(char* genres, movieType* movie)
                 }
         }
 }
+
+int fileExists(char* filename)
+{
+    FILE* f;
+    if (f = fopen(filename, "r"))
+    {
+        fclose(f);
+        return 1;
+    }
+    return 0;
+}
