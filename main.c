@@ -70,11 +70,12 @@ void manualAdd(HashMap* globalMap, userType* user)
         scanf("%d", newMovie->year);
         getchar();
         char* string_year = (char*) malloc (20*sizeof(char));
-        sprintf(string_year, "%d", newMovie->year);
+        sprintf(string_year, "%d", *newMovie->year);
         gotoxy(29,6);
         
         printf("Genres (separated by commas): ");
         scanf("%[^\n]s", genres);
+        getchar();
         split_and_AddGenres(genres, newMovie);
         gotoxy(29, 7);
         
@@ -82,24 +83,35 @@ void manualAdd(HashMap* globalMap, userType* user)
         scanf("%d", newMovie->runtime);
         getchar();
         char* string_runtime = (char*) malloc (20*sizeof(char));
-        sprintf(string_runtime, "%d", newMovie->runtime);
+        sprintf(string_runtime, "%d", *newMovie->runtime);
         
         gotoxy(29, 8);
         printf("Your Rating (from 1 to 10): ");
         scanf("%d", newMovie->userScore);
         getchar();
         char* string_rating = (char*) malloc (20*sizeof(char));
-        sprintf(string_rating, "%d", newMovie->userScore);
+        sprintf(string_rating, "%d", *newMovie->userScore);
         
         insertMovie(globalMap, newMovie, user, string_year, string_rating, string_runtime);
 
         char path[100];
         snprintf(path, sizeof(path), "users/%s.csv", user->user_id);
         FILE* userfile = fopen(path, "at");
-        fputc('\n', userfile);
+        long size;
+        if (NULL != userfile)
+        {
+                fseek(userfile, 0, SEEK_END);
+                size = ftell(userfile);
+        }
+        if (size > 0)
+                fputc('\n', userfile);
+        
         fclose(userfile);
 
         exportMovie(newMovie, user->user_id, string_year, string_runtime, string_rating);
+
+        gotoxy(30, 10);
+        printf("Your movie was added!\n");
         
         getch();
 }
@@ -133,7 +145,16 @@ void import_csv(HashMap* globalMap, userType* user)
         char path[100];
         snprintf(path, sizeof(path), "users/%s.csv", user->user_id);
         FILE* userfile = fopen(path, "at");
-        fputc('\n', userfile);
+
+        long size;
+
+        if (NULL != userfile)
+        {
+                fseek(userfile, 0, SEEK_END);
+                size = ftell(userfile);
+        }
+        if (size > 0)
+                fputc('\n', userfile);
         fclose(userfile);
 
         char linea[1024];
@@ -196,6 +217,7 @@ void import_csv(HashMap* globalMap, userType* user)
 void addMovies(HashMap* globalMap, userType* user)
 {
         int option;
+        char choice[2];
         system("cls");
         gotoxy(30, 2);
         printf("(1) Add a movie manually\n");
@@ -209,6 +231,16 @@ void addMovies(HashMap* globalMap, userType* user)
         switch(option)
         {
                 case 1: manualAdd(globalMap, user);
+                        while (choice[0] != 'n')
+                        {
+                                system("cls");
+                                gotoxy(28, 3);
+                                printf("Do you wish to add another movie? (y/n) : ");
+                                scanf("%[^\n]s", choice);
+                                getchar();
+                                if (choice[0] == 'y')
+                                        manualAdd(globalMap, user);
+                        }
                         break;
                 case 2: import_csv(globalMap, user);
                         break;

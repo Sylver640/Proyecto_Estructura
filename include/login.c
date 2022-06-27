@@ -26,7 +26,9 @@ void exportMovie(movieType* movie, char* username, char* year, char* runtime, ch
         fputc('"', f);
         char* genre = firstList(movie->genres);
         fputs(genre, f);
-        fputc(',', f);
+        genre = nextList(movie->genres);
+        if (genre != NULL)
+                fputc(',', f);
         while (genre != NULL)
         {
                 fputs(genre, f);
@@ -34,7 +36,7 @@ void exportMovie(movieType* movie, char* username, char* year, char* runtime, ch
                 if (genre == NULL) break;
                 fputc(',', f);
         }
-        fputc('"', f);
+        fputc('"', f); 
         fputc(',', f);
         fputs(runtime, f);
         fputc(',', f);
@@ -145,6 +147,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
         FILE* f = fopen(path, "rt");
         if (f == NULL)
         {
+                assignUserName(loggedUser, username);
                 gotoxy(25, 7);
                 printf("This user doesn't exist!\n");
                 gotoxy(25,8);
