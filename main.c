@@ -370,6 +370,7 @@ void searchByID(HashMap* allMovies, char* ID){
         printf("Searching for the movie...");
         Sleep(3000);
         if(foundMovie != NULL){
+            system("cls");
             gotoxy(30,1);    
             printf("Your movie has been found!\n\n");    
             movieType* movieData = foundMovie->value;
@@ -399,6 +400,7 @@ void searchByID(HashMap* allMovies, char* ID){
             printf("Press any button to return to the main menu.");
 
         }else{
+          system("cls");      
           gotoxy(30,4);
           printf("We are sorry, your movie could not be found.\n");
           gotoxy(30,6);
