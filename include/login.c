@@ -26,11 +26,13 @@ void exportMovie(movieType* movie, char* username, char* year, char* runtime, ch
         fputc('"', f);
         char* genre = firstList(movie->genres);
         fputs(genre, f);
+        fputc(',', f);
         while (genre != NULL)
         {
-                fputc(',', f);
-                genre = nextList(movie->genres);
                 fputs(genre, f);
+                genre = nextList(movie->genres);
+                if (genre == NULL) break;
+                fputc(',', f);
         }
         fputc('"', f);
         fputc(',', f);
