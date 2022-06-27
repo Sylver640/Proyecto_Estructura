@@ -213,7 +213,7 @@ int calculateAffinity (userType* user1, userType* user2)
 
                 //calculo afinidad, afinidad es un porcentaje que va de 0 a 100
                 //100 siendo la misma nota, y 1 cuando las notas son los extremos opuestos
-                int affinity = 100 - (score1-score2)*11; 
+                int affinity = 100 - (abs(score1-score2))*11; 
                 sumAffinity += affinity; //se suma la afinidad a la cantidad total de afinidad
                 currentMovieID = nextList(matchingMovies);
         }
@@ -234,6 +234,7 @@ void userDiscovery (userType* loggedUser, HashMap* usersMap)
                 {
                         printf("user name: %s\n", currentUser->user_id);
                         printf("number of movies: %d\n", currentUser->movieNumber);
+                        printf("affinity percentage: %d\n", affinity);
                         printf("\n");
                 }
                 currentUserPair = nextMap(usersMap);
