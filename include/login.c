@@ -73,7 +73,9 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 newCategory->name = (char*) malloc (100*sizeof(char));
                 strcpy(newCategory->name, year);
                 newCategory->movie_list = createList();
+                newCategory->numberOfMovies = 0;
                 pushBack(newCategory->movie_list, movie);
+                newCategory->numberOfMovies++;
                 insertTreeMap(user->yearOrder, movie->year, newCategory);
         }
         else
@@ -81,6 +83,7 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 Pair* searchTreeMapData = searchTreeMap(user->yearOrder, movie->year);
                 movieCategory* yearSearched = searchTreeMapData->value;
                 pushBack(yearSearched->movie_list, movie);
+                yearSearched->numberOfMovies++;
         }
 
         char* searched_genre = firstList(movie->genres);
@@ -92,7 +95,9 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                         newCategory->name = (char*) malloc (100*sizeof(char));
                         strcpy(newCategory->name, searched_genre);
                         newCategory->movie_list = createList();
+                        newCategory->numberOfMovies = 0;
                         pushBack(newCategory->movie_list, movie);
+                        newCategory->numberOfMovies++;
                         insertMap(user->moviesByGenre, searched_genre, newCategory);
                 }
                 else
@@ -100,6 +105,7 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                         Par* searchData = searchMap(user->moviesByGenre, searched_genre);
                         movieCategory* genreInMap = searchData->value;
                         pushBack(genreInMap->movie_list, movie);
+                        genreInMap->numberOfMovies++;
                 }
                 searched_genre = nextList(movie->genres);
         }
@@ -110,7 +116,9 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 newCategory->name = (char*) malloc (100*sizeof(char));
                 strcpy(newCategory->name, runtime);
                 newCategory->movie_list = createList();
+                newCategory->numberOfMovies = 0;
                 pushBack(newCategory->movie_list, movie);
+                newCategory->numberOfMovies++;
                 insertTreeMap(user->runtimeOrder, movie->runtime, newCategory);
         }
         else
@@ -118,6 +126,7 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 Pair* searchTreeMapData = searchTreeMap(user->runtimeOrder, movie->runtime);
                 movieCategory* runtimeSearched = searchTreeMapData->value;
                 pushBack(runtimeSearched->movie_list, movie);
+                runtimeSearched->numberOfMovies++;
         }
                         
         if (searchTreeMap(user->ratingOrder, movie->userScore) == NULL)
@@ -126,7 +135,9 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 newCategory->name = (char*) malloc (100*sizeof(char));
                 strcpy(newCategory->name, score);
                 newCategory->movie_list = createList();
+                newCategory->numberOfMovies = 0;
                 pushBack(newCategory->movie_list, movie);
+                newCategory->numberOfMovies++;
                 insertTreeMap(user->ratingOrder, movie->userScore, newCategory);
         }
         else
@@ -134,6 +145,7 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 Pair* searchTreeMapData = searchTreeMap(user->ratingOrder, movie->userScore);
                 movieCategory* ratingSearched = searchTreeMapData->value;
                 pushBack(ratingSearched->movie_list, movie);
+                ratingSearched->numberOfMovies++;
         }
         user->movieNumber++; //se aumenta en una unidad el número de películas del usuario en uno
         

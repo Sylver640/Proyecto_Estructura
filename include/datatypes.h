@@ -33,6 +33,7 @@ typedef struct movieCategory //Corresponde a cada categoría que se puede encasi
 {
         char* name;
         List* movie_list;
+        long numberOfMovies;
 } movieCategory;
 
 #endif

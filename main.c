@@ -583,9 +583,16 @@ void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){
         }
 }
 
+void loggedProfile(userType* user)
+{
+
+}
+
 //Función que muestra las opciones para ver los perfiles de algún usuario
 void showProfiles(HashMap* usersMap, userType* loggedUser)
 {
+        //Creación de submenú
+
         int option;
         system("cls");
         gotoxy(30, 2);
@@ -599,7 +606,7 @@ void showProfiles(HashMap* usersMap, userType* loggedUser)
         
         switch(option)
         {
-                case 1: //loggedProfile(loggedUser);
+                case 1: loggedProfile(loggedUser);
                         break;
                 case 2: //userProfile(usersMap);
                         break;
