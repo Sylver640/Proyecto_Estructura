@@ -257,6 +257,7 @@ movieType* searchMovieUserList(userType* user, char* movie_id)
 
 void movieDiscovery (HashMap* usersMap, userType* loggedUser)
 {
+        getchar();
         char username[100];
         printf("Enter other username for comparison: ");
         scanf("%[^\n]s", username);
@@ -267,6 +268,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         {
                 //no se ha encontrado el usuario buscado
                 printf("The user you are searching for does not exist.");
+                getchar();
                 return;
         }
         userType* otherUser = searched_result->value;
@@ -296,6 +298,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                 }
                 currentMovie = nextList(firstMovieRating->movie_list);
         }
+        getchar();
 }
 
 //función para encontrar todas las películas en comun que han visto usuario1 y usuario2
@@ -344,6 +347,7 @@ int calculateAffinity (userType* user1, userType* user2)
 void userDiscovery (userType* loggedUser, HashMap* usersMap)
 {
         printf("Searching for compatible users...\n");
+        getchar();
         Par* currentUserPair = firstMap(usersMap);
         while (currentUserPair != NULL)
         {
@@ -360,6 +364,7 @@ void userDiscovery (userType* loggedUser, HashMap* usersMap)
                 currentUserPair = nextMap(usersMap);
         }
         printf("Search finished.\n");
+        getchar();
 }
 
 void searchByID(HashMap* allMovies, char* ID){
