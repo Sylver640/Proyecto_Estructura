@@ -273,7 +273,15 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         }
         userType* otherUser = searched_result->value;
         
+        bool hasRecommended = false;
         Pair* firstRating = firstTreeMap(otherUser->ratingOrder);
+        if (firstRating == NULL)
+        {
+                //este usuario no ha calificado ninguna pelicula
+                printf("The user you are searching for has not rated any movie.\n");
+                getchar();
+                return;
+        }
         movieCategory* firstMovieRating = firstRating->value;
         movieType* currentMovie = firstList(firstMovieRating->movie_list);
         while (currentMovie != NULL)
@@ -282,6 +290,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                 if (searchMovieUserList(loggedUser, currentMovie->movie_id) == NULL)
                 {
                         //película no ha sido vista, se recomienda a logged user
+                        hasRecommended = true;
                         printf("movie name: %s\n", currentMovie->movieName);
                         printf("movie ID: %s\n", currentMovie->movie_id);
                         printf("year of release: %d\n", currentMovie->year);
@@ -297,6 +306,11 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                         printf("runtime: %d\n", currentMovie->runtime);
                 }
                 currentMovie = nextList(firstMovieRating->movie_list);
+        }
+        if (hasRecommended == false)
+        {
+                //no se han encontrado peliculas por recomendar
+                printf("Sorry, we couldn't find a movie to recommend you :(\n");
         }
         getchar();
 }
