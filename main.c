@@ -378,8 +378,10 @@ void searchByID(HashMap* allMovies, char* ID){
             char* genre = firstList(movieData->genres);
             printf("Genres: ");
             if(genre != NULL){
+                printf("%s", genre);
+                genre = nextList(movieData->genres);
                 while(genre != NULL){
-                  printf("%s, ", genre);
+                  printf(", %s", genre);
                   genre = nextList(movieData->genres);
                 }
                 printf(".");
