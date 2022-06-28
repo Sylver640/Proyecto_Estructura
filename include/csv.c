@@ -46,20 +46,22 @@ char *get_csv_field (char * tmp, int k) {
     return NULL;
 }
 
+//Función que separa cada género y los agrega a la lista de la película
 void split_and_AddGenres(char* genres, movieType* movie)
 {
         char limit[3] = ", ";
-        char* token = strtok(genres, limit);
+        char* token = strtok(genres, limit); //Cada token corresponde a un género
         if (token != NULL)
         {
                 while (token != NULL)
                 {
-                        pushBack(movie->genres, token);
-                        token = strtok(NULL, limit);
+                        pushBack(movie->genres, token); //se agrega a la lista
+                        token = strtok(NULL, limit); //se avanza al siguiente género si es que hay
                 }
         }
 }
 
+//Ve si el archivo existe
 int fileExists(char* filename)
 {
     FILE* f;

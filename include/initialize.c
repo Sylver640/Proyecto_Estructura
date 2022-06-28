@@ -43,6 +43,7 @@ int lower_than_int(void * key1, void * key2) {
     return 0;
 }
 
+//Función para inicializar a un usuario
 userType* createUser()
 {
         userType* newUser = (userType*) malloc (sizeof(userType));
@@ -57,6 +58,7 @@ userType* createUser()
         return newUser;
 }
 
+//Función para inicializar una película
 movieType* createMovie()
 {
         movieType* new = (movieType*) malloc (sizeof(movieType));
@@ -68,6 +70,7 @@ movieType* createMovie()
         new->userScore = (int*) malloc (sizeof(int));
 }
 
+//Asignación de nombre para cada usuario
 void assignUserName(userType* user, char* username)
 {
   //se asegura que el usuario ya va a estar creado

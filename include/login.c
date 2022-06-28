@@ -12,11 +12,12 @@
 #include "initialize.h"
 #include "datatypes.h"
 
+//Función para exportar una película al archivo del usuario
 void exportMovie(movieType* movie, char* username, char* year, char* runtime, char* score)
 {
         char path[100];
         snprintf(path, sizeof(path), "users/%s.csv", username);
-        FILE* f = fopen(path, "at");
+        FILE* f = fopen(path, "at"); //se abre el archivo en modo adición
         fputs(movie->movie_id, f);
         fputc(',', f);
         fputc('"', f);
@@ -43,22 +44,28 @@ void exportMovie(movieType* movie, char* username, char* year, char* runtime, ch
         fputs(runtime, f);
         fputc(',', f);
         fputs(score, f);
-        if (feof(f) == 0)     
+        if (feof(f) == 0) //se imprime un salto de línea si no es el final del archivo   
                 putc('\n', f);
         fclose(f);
 
 }
 
+//Función para insertar una película
 void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* year, char* score, char* runtime)
 {
-        insertMap(globalMap, movie->movie_id, movie);
+        insertMap(globalMap, movie->movie_id, movie); //se inserta en el mapa global
 
-        if (searchMap(user->movieMap, movie->movie_id) != NULL)
+        if (searchMap(user->movieMap, movie->movie_id) != NULL) //si la película ya existe en el perfil del usuario, se retorna
                 return;
 
-        insertMap(user->movieMap, movie->movie_id, movie);
+        insertMap(user->movieMap, movie->movie_id, movie); //se inserta en el mapa por id
                         
-        insertTreeMap(user->abcOrder, movie->movieName, movie);
+        insertTreeMap(user->abcOrder, movie->movieName, movie); //se inserta en el mapa por orden alfabético
+
+        //A continuación, como se trabaja con mapas ordenados y las claves se podían repetir, primero se busca en el mapa la categoría.
+        //Si esta no existe, se crea una nueva variable movieCategory, su nombre es aquel de la categoría a agregar, y se agrega
+        //la película en su lista correspondiente, para luego agregar esta nueva categoría al mapa. En cambio, si ya existe solo
+        //se busca en el mapa y se agrega el filme a su lista.
 
         if (searchTreeMap(user->yearOrder, movie->year) == NULL)
         {
@@ -128,11 +135,11 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 movieCategory* ratingSearched = searchTreeMapData->value;
                 pushBack(ratingSearched->movie_list, movie);
         }
-        user->movieNumber++;
+        user->movieNumber++; //se aumenta en una unidad el número de películas del usuario en uno
         
 }
 
-
+//Inicio de sesión de un usuario en específico
 void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashMap* usersMap)
 {
         char path[100];
@@ -140,15 +147,17 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
         logo();
 
         //aquí tengo que arreglar un problema donde se acepta la tecla enter como username, y crea un csv con nombre basura
+        //Se lee el nombre del usuario
         gotoxy(25, 5);
         printf("Enter your username: ");
-        scanf("%[^\n]s", username);
+        scanf("%s", username);
         getchar();
 
         snprintf(path, sizeof(path), "users/%s.csv", username);
-        FILE* f = fopen(path, "rt");
+        FILE* f = fopen(path, "rt"); //se abre el archivo del usuario en modo lectura
         if (f == NULL)
         {
+                //Si el usuario no se encuentra en la carpeta, se crea su archivo csv y se retorna al menú principal
                 assignUserName(loggedUser, username);
                 gotoxy(25, 7);
                 printf("This user doesn't exist!\n");
@@ -165,6 +174,7 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
         char linea[1024];
         int i;
 
+        //Se lee el archivo csv, insertando cada película
         while (fgets(linea, 1023, f) != NULL)
         {
                 for (i = 0; i < 1; i++)
@@ -196,36 +206,41 @@ void login (char* username, userType* loggedUser, HashMap* globalMovieMap, HashM
                 }
         }
 
-        insertMap(usersMap, username, loggedUser);
+        insertMap(usersMap, username, loggedUser); //se inserta al usuario en el mapa de éstos
         
-        fclose(f);
+        fclose(f); //se cierra el archivo
 }
 
+//Función para añadir a todos los demás usuarios
 void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMap)
 {
+        //Con ayuda de estas variables, será posible recorrer cada usuario dentro del directorio users
+
         DIR *d;
         struct dirent *dir;
         FILE *f;
 
+        //String para evitar abrir de nuevo el archivo del usuario logueado
         char ignored_file[100];
         strcpy(ignored_file, ignored_user);
         strcat(ignored_file, ".csv");
 
-        d = opendir("./users");
+        d = opendir("./users"); //se abre el directorio
 
+        //Se recorre todo el directorio
         if (d)
         {
                 while((dir = readdir(d)) != NULL)
                 {
-                        if (strcmp(dir->d_name, ignored_file) == 0)
+                        if (strcmp(dir->d_name, ignored_file) == 0) //si se encuentra el nombre del usuario logueado, se continua al siguiente archivo
                                 continue;
 
-                        f = fopen(dir->d_name, "rt");
+                        f = fopen(dir->d_name, "rt"); //se abre el archivo en modo lectura
                         char newuser_username[100];
-                        if (strstr(dir->d_name, ".csv") != NULL)
+                        if (strstr(dir->d_name, ".csv") != NULL) //se verifica que el archivo sea .csv, para evitar errores
                         {
                                 for (int i = 0; i < strlen(dir->d_name)-4; i++)
-                                        newuser_username[i] = dir->d_name[i];
+                                        newuser_username[i] = dir->d_name[i]; //se elimina el csv del nombre para copiarlo en los datos del usuario
                         } else continue;
 
                         userType* newUser = createUser();
@@ -233,8 +248,8 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                         
                         char linea[1024];
                         int k;
-                        Pair* searchData;
 
+                        //Se recorre el archivo
                         while(fgets(linea, 1023, f) != NULL)
                         {
                                 for (k = 0; k < 1; k++)
@@ -253,7 +268,6 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
 
                                         char* movie_genres = get_csv_field(linea, k+3);
                                         split_and_AddGenres(movie_genres, newMovie);
-                                        if (firstList(newMovie->genres) != NULL) printf("se insertan generos\n");getch(); //testing
 
                                         char* runtime = get_csv_field(linea, k+4);
                                         int runtimeToNumber = atoi(runtime);
@@ -269,10 +283,10 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
 
                         insertMap(usersMap, newuser_username, newUser);
                         
-                        memset(newuser_username,0,sizeof(newuser_username));
-                        fclose(f);
+                        memset(newuser_username,0,sizeof(newuser_username)); //para evitar errores, se limpia la variable correspondiente al nombre del usuario
+                        fclose(f); //se cierra el archivo
                 }
         }
 
-        closedir(d);
+        closedir(d); //se cierra el directorio
 }

@@ -17,23 +17,29 @@
 #include "include/datatypes.h"
 #include "include/initialize.h"
 
+//Función para añadir manualmente
 void manualAdd(HashMap* globalMap, userType* user)
 {
-        system("cls");
+        system("cls"); //Se limpia la pantalla
         
+        //Inicialización de variables
         movieType* newMovie = createMovie();
         char* movie_id = (char*) malloc (100*sizeof(char));
         char* genres = (char*) malloc (100*sizeof(char));
+        
         gotoxy(30, 2);
         printf("We need some information first...\n");
 
         gotoxy(29, 3);
+        //Recepción de datos
         printf("ID: ");
         scanf("%[^\n]s", newMovie->movie_id);
         getchar();
-        Par* search = searchMap(user->movieMap, newMovie->movie_id);
+        Par* search = searchMap(user->movieMap, newMovie->movie_id);//Si la película se encuentra en el perfil del usuario, se muestran
+                                                                    //sus datos y se retorna al menú anterior.
         if (search != NULL)
         {
+                //Impresión de datos
                 movieType* movieData = search->value;
                 system("cls");
                 gotoxy(30, 4);
@@ -60,6 +66,7 @@ void manualAdd(HashMap* globalMap, userType* user)
                 return;
         }
         
+        //Más lectura de datos
         gotoxy(29, 4);
         printf("Name: ");
         scanf("%[^\n]s", newMovie->movieName);
@@ -69,6 +76,7 @@ void manualAdd(HashMap* globalMap, userType* user)
         printf("Year: ");
         scanf("%d", newMovie->year);
         getchar();
+        //Copia de año a char para su uso en la función de insertMovie
         char* string_year = (char*) malloc (20*sizeof(char));
         sprintf(string_year, "%d", *newMovie->year);
         gotoxy(29,6);
@@ -82,6 +90,7 @@ void manualAdd(HashMap* globalMap, userType* user)
         printf("Runtime (in minutes): ");
         scanf("%d", newMovie->runtime);
         getchar();
+        //Copia de duración a char para su uso en la función de insertMovie
         char* string_runtime = (char*) malloc (20*sizeof(char));
         sprintf(string_runtime, "%d", *newMovie->runtime);
         
@@ -89,12 +98,12 @@ void manualAdd(HashMap* globalMap, userType* user)
         printf("Your Rating (from 1 to 10): ");
         scanf("%d", newMovie->userScore);
         getchar();
+        //Copia de score a char para su uso en la función de insertMovie
         char* string_rating = (char*) malloc (20*sizeof(char));
         sprintf(string_rating, "%d", *newMovie->userScore);
         
-        insertMovie(globalMap, newMovie, user, string_year, string_rating, string_runtime);
-
-        exportMovie(newMovie, user->user_id, string_year, string_runtime, string_rating);
+        insertMovie(globalMap, newMovie, user, string_year, string_rating, string_runtime); //Se inserta la película
+        exportMovie(newMovie, user->user_id, string_year, string_runtime, string_rating); //Se agrega al archivo del usuario
 
         gotoxy(30, 10);
         printf("Your movie was added!\n");
@@ -102,6 +111,7 @@ void manualAdd(HashMap* globalMap, userType* user)
         getch();
 }
 
+//Función para importar películas desde archivo externo de IMDb
 void import_csv(HashMap* globalMap, userType* user)
 {
         system("cls");
@@ -109,17 +119,17 @@ void import_csv(HashMap* globalMap, userType* user)
         printf("Checking for \"ratings.csv\" file...\n");
         getch();
 
-        if (fileExists("ratings.csv") == 0)
+        if (fileExists("ratings.csv") == 0) //Se busca si el archivo está presente en la raíz del programa. Es decir, donde se ubica el ejecutable
         {
                 gotoxy(30, 5);
                 printf("File not found!\n");
                 gotoxy(30, 6);
                 printf("Make sure the file is in the same place as the executable.\n");
                 getch();
-                return;
+                return; //Como no se encontró, se retorna al menú principal
         }
 
-        FILE* f = fopen("ratings.csv", "rt");
+        FILE* f = fopen("ratings.csv", "rt"); //se abre el archivo ratings en modo lectura
         gotoxy(30,5);
         printf("File opened!\n");
         gotoxy(30,6);
@@ -129,31 +139,36 @@ void import_csv(HashMap* globalMap, userType* user)
         system("cls");
 
         char path[100];
-        snprintf(path, sizeof(path), "users/%s.csv", user->user_id);
-        FILE* userfile = fopen(path, "at");
+        snprintf(path, sizeof(path), "users/%s.csv", user->user_id); //se copia el nombre del usuario a un string que dirige a la ubicación de su archivo
+        FILE* userfile = fopen(path, "at"); //se abre el archivo en modo adición
 
         char linea[1024];
         int i;
-        long processedMovies = 0;
+        long processedMovies = 0; //contador para luego mostrar en pantalla cuántas películas se agregaron
 
         fgets(linea, 1023, f);
         while (fgets(linea, 1023, f) != NULL)
         {
+                //Se copian los datos de cada película con la ayuda de get_csv_field
                 for (i = 0; i < 1; i++)
                 {
                         char* check = get_csv_field(linea, i+5);
-                        if (strcmp(check, "movie") != 0)
-                                continue;
+                        if (strcmp(check, "movie") != 0) //si se detecta que en la línea presente no se trabaja con una película, se continua a la siguiente
+                                continue; 
                         movieType* newMovie = createMovie();
                         
                         char* csv_id = get_csv_field(linea, i);
                         char* movie_id = (char*) malloc (100*sizeof(char));
-                        strncpy(movie_id, csv_id+2, strlen(csv_id));
+                        strncpy(movie_id, csv_id+2, strlen(csv_id)); //como el id en ratings.csv tiene dos 't' al principio, se copia lo que retorna get_csv_field
+                                                                     //luego de dos caracteres
                         strcpy(newMovie->movie_id, movie_id);
 
-                        if (searchMap(user->movieMap, movie_id) != NULL)
+                        if (searchMap(user->movieMap, movie_id) != NULL) //si se detecta que la película ya la tiene el usuario en su perfil, se continua con la siguiente línea
                                 continue;
 
+                        //Copia de datos
+                        //Con atoi se convierte a entero para agregar el dato a la película (movieType)
+                        
                         char* movieName = get_csv_field(linea, i+3);
                         strcpy(newMovie->movieName, movieName);
 
@@ -173,7 +188,7 @@ void import_csv(HashMap* globalMap, userType* user)
                         *newMovie->userScore = scoreToNumber;
 
                         if (searchMap(user->movieMap, movie_id) == NULL)
-                                processedMovies++;
+                                processedMovies++; //si la película no se encontró en el mapa del usuario, el contador de agregadas aumenta en uno
 
                         insertMovie(globalMap, newMovie, user, movieYear, userScore, runtime);
                         exportMovie(newMovie, user->user_id, movieYear, runtime, userScore);
@@ -186,14 +201,17 @@ void import_csv(HashMap* globalMap, userType* user)
         printf("Press any key to return to the main menu.");
         
         fclose(f);
-        //removeBlankLines(f, path);
         getch();
 }
 
+//Función que entrega opciones para añadir películas
 void addMovies(HashMap* globalMap, userType* user)
 {
+        //Inicialización de variables
+
         int option;
         char choice[2];
+        //Creación de submenú
         system("cls");
         gotoxy(30, 2);
         printf("(1) Add a movie manually\n");
@@ -207,7 +225,7 @@ void addMovies(HashMap* globalMap, userType* user)
         switch(option)
         {
                 case 1: manualAdd(globalMap, user);
-                        while (choice[0] != 'n')
+                        while (choice[0] != 'n') //bucle para confirmar si el usuario desea agregar otra película
                         {
                                 system("cls");
                                 gotoxy(28, 3);
@@ -500,6 +518,7 @@ void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){
         }
 }
 
+//Función que muestra las opciones para ver los perfiles de algún usuario
 void showProfiles(HashMap* usersMap, userType* loggedUser)
 {
         int option;
@@ -524,8 +543,10 @@ void showProfiles(HashMap* usersMap, userType* loggedUser)
 
 int main()
 {
-    HashMap* usersMap = createMap(30);
-    HashMap* globalMovieMap = createMap(30);
+    //Inicialización de variables
+            
+    HashMap* usersMap = createMap(30); //Mapa de usuarios
+    HashMap* globalMovieMap = createMap(30); //Mapa global que contiene todas las películas
     char* loggedUserName = (char*) malloc (100*sizeof(char));
     userType* loggedUser = createUser();
     char* movieID = (char*) malloc(100*sizeof(char)); //<-- Para recibir el ID de la pelicula a buscar en la función 2.
@@ -533,16 +554,18 @@ int main()
     login(loggedUserName, loggedUser, globalMovieMap, usersMap);
     addOtherUsers(loggedUserName, usersMap, globalMovieMap);
     
+    //Creación de menú
+
     int option;
     while (1)
     {
         system("cls");
         gotoxy(30, 1);
-        printf("WELCOME, %s\n", loggedUserName);
+        printf("WELCOME, %s\n", loggedUserName); //se imprime el nombre del usuario
         gotoxy(30, 2);
         printf("1. Add movies\n");
         gotoxy(30, 3);
-        printf("2. Search for a movie\n"); //así que, en vez de aquí buscar csv por csv, solo bastaría con abrir el mapa global
+        printf("2. Search for a movie\n");
         gotoxy(30, 4);
         printf("3. Show user's movies\n");
         gotoxy(30, 5);

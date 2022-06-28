@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+//Función para imprimir algo en una posición específica de la consola
 void gotoxy(int x, int y)
 {
     HANDLE manipulator = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -11,6 +12,7 @@ void gotoxy(int x, int y)
     SetConsoleCursorPosition(manipulator, coord);
 }
 
+//Centra el texto a la altura deseada
 void centerText (const char *text, int y)
 {
         int text_size = strlen(text);
@@ -18,6 +20,7 @@ void centerText (const char *text, int y)
         printf("%s", text);
 }
 
+//Imprime el logo de la aplicación
 void logo()
 {
     printf("\n");
