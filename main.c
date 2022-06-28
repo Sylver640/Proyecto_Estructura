@@ -404,7 +404,6 @@ void searchByID(HashMap* allMovies, char* ID){
 }
 
 void showMoviesThreeToSix(TreeMap* criteriaMap, char* user_Name){
-        //Empezar siempre en posicion minima (minimum())
         gotoxy(30,4);
         printf("Preparing to show the movies...");
         Sleep(2000);
@@ -438,17 +437,44 @@ void showMoviesThreeToSix(TreeMap* criteriaMap, char* user_Name){
         }
 
         printf("\n");
-        centerText("All movies have been successfully analysed, press any button to return to the menu", 6);
+        printf("All movies have been successfully analysed, press any button to return to the menu");
         getch();
-
-
-        //Mostrar datos de la pelicula y pasar a siguiente posicion.
 
 }
 
 void showMoviesGenre(HashMap* genreMap, char* user_Name){
         //Pedir genero y hacer searchMap().
-        //Mostrar todas las peliculas de la lista de ese genero y su info.
+        char* pickedGenre;
+        gotoxy(30,4);
+        printf("Please enter a movie genre: ");
+        scanf("%s", pickedGenre);
+
+        system("cls");
+        gotoxy(30,4);
+        printf("Preparing to show the movies...");
+        Sleep(2000);
+        Par* foundGenre = searchMap(genreMap, pickedGenre);
+        if(foundGenre != NULL){
+            system("cls");
+            gotoxy(30,1);    
+            printf("The movies that contain this genre are:\n\n");    
+            movieCategory* category = foundGenre->value;
+            movieType* movieData = firstList(category->movie_list);
+
+            while(movieData != NULL){
+                printf("Title: %s\n", movieData->movieName);
+                movieData = nextList(category->movie_list);
+            }
+
+            printf("\n\nPress any button to return to the main menu.");
+        }else{
+          system("cls");      
+          gotoxy(30,4);
+          printf("We are sorry, there are no movies containing this genre\n");
+          gotoxy(30,6);
+          printf("Press any button to return to the main menu.");
+        }
+        getch();
 
 }
 
