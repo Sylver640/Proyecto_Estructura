@@ -94,20 +94,6 @@ void manualAdd(HashMap* globalMap, userType* user)
         
         insertMovie(globalMap, newMovie, user, string_year, string_rating, string_runtime);
 
-        char path[100];
-        snprintf(path, sizeof(path), "users/%s.csv", user->user_id);
-        FILE* userfile = fopen(path, "at");
-        long size;
-        if (NULL != userfile)
-        {
-                fseek(userfile, 0, SEEK_END);
-                size = ftell(userfile);
-        }
-        if (size > 0)
-                fputc('\n', userfile);
-        
-        fclose(userfile);
-
         exportMovie(newMovie, user->user_id, string_year, string_runtime, string_rating);
 
         gotoxy(30, 10);
@@ -145,17 +131,6 @@ void import_csv(HashMap* globalMap, userType* user)
         char path[100];
         snprintf(path, sizeof(path), "users/%s.csv", user->user_id);
         FILE* userfile = fopen(path, "at");
-
-        long size;
-
-        if (NULL != userfile)
-        {
-                fseek(userfile, 0, SEEK_END);
-                size = ftell(userfile);
-        }
-        if (size > 0)
-                fputc('\n', userfile);
-        fclose(userfile);
 
         char linea[1024];
         int i;
@@ -209,8 +184,9 @@ void import_csv(HashMap* globalMap, userType* user)
         printf("%ld movies were added to your profile.\n", processedMovies);
         gotoxy(30, 5);
         printf("Press any key to return to the main menu.");
-
+        
         fclose(f);
+        //removeBlankLines(f, path);
         getch();
 }
 

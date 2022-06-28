@@ -19,7 +19,9 @@ void exportMovie(movieType* movie, char* username, char* year, char* runtime, ch
         FILE* f = fopen(path, "at");
         fputs(movie->movie_id, f);
         fputc(',', f);
+        fputc('"', f);
         fputs(movie->movieName, f);
+        fputc('"', f);
         fputc(',', f);
         fputs(year, f);
         fputc(',', f);
@@ -41,8 +43,8 @@ void exportMovie(movieType* movie, char* username, char* year, char* runtime, ch
         fputs(runtime, f);
         fputc(',', f);
         fputs(score, f);
-        fputc('\n', f);
-
+        if (feof(f) == 0)     
+                putc('\n', f);
         fclose(f);
 
 }

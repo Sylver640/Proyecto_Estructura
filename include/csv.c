@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <conio.h>
 
 #include "list.h"
 #include "datatypes.h"
@@ -69,3 +70,45 @@ int fileExists(char* filename)
     }
     return 0;
 }
+
+/*int isBlank(const char* buffer)
+{
+    char character;
+
+    do
+    {
+        character = *(buffer)++;
+
+        if (character != ' ' && character != '\t' && character != '\n' && character != '\r' && character != '\0')
+            return 0;
+
+    } while (character != '\0');
+
+    return 1;
+    
+}
+
+void removeBlankLines(FILE* original, char* path)
+{
+    printf("entra\n");
+    getch();
+    original = fopen(path, "rt");
+    if (original != NULL) printf("se abre archivo\n");
+    getch();
+    FILE* temp = fopen("temp.csv", "wt");
+    if (temp != NULL) printf("se abre temporal\n");
+    getch();
+
+    char buffer[1024];
+    while ((fgets(buffer, 1024, original)) != NULL)
+    {
+        if (!isBlank(buffer));
+            fputs(buffer, temp);
+    }
+
+    fclose(original);
+    fclose(temp);
+    
+    remove(path);
+    rename("temp.csv", path);
+}*/
