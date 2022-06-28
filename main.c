@@ -265,6 +265,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         Par* searched_result = searchMap(usersMap, username);
         if ( searched_result == NULL)
         {
+                //no se ha encontrado el usuario buscado
                 printf("The user you are searching for does not exist.");
                 return;
         }
@@ -297,6 +298,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         }
 }
 
+//función para encontrar todas las películas en comun que han visto usuario1 y usuario2
 List* findAllMatchingMovies (userType* user1, userType* user2)
 {
         List* matchingMovies = createList();
@@ -329,12 +331,13 @@ int calculateAffinity (userType* user1, userType* user2)
 
                 //calculo afinidad, afinidad es un porcentaje que va de 0 a 100
                 //100 siendo la misma nota, y 1 cuando las notas son los extremos opuestos
-                int affinity = 100 - (abs(score1-score2))*11; 
+                int affinity = 100 - (abs(score1-score2))*11; //se necesita el valor absoluto del calculo
                 sumAffinity += affinity; //se suma la afinidad a la cantidad total de afinidad
                 currentMovieID = nextList(matchingMovies);
         }
         if (numMovies == 0) return 0;
-        int avgAffinity = sumAffinity / numMovies;
+        //afinidad promedio se calcula con la suma de las afinidades dividido por el numero de peliculas
+        int avgAffinity = sumAffinity / numMovies; 
         return avgAffinity;
 }
 
@@ -346,6 +349,7 @@ void userDiscovery (userType* loggedUser, HashMap* usersMap)
         {
                 userType* currentUser = currentUserPair->value;
                 int affinity = calculateAffinity(loggedUser, currentUser);
+                //se consideran usuarios afines a aquellos que tengan más o igual a 75% de afinidad
                 if (affinity >= 75)
                 {
                         printf("user name: %s\n", currentUser->user_id);
