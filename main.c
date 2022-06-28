@@ -405,6 +405,43 @@ void searchByID(HashMap* allMovies, char* ID){
 
 void showMoviesThreeToSix(TreeMap* criteriaMap, char* user_Name){
         //Empezar siempre en posicion minima (minimum())
+        gotoxy(30,4);
+        printf("Preparing to show the movies...");
+        Sleep(2000);
+        Pair* position = firstTreeMap(criteriaMap);
+        if(position == NULL){
+                system("cls");
+                gotoxy(30,4);
+                printf("There are no movies to show!");
+                gotoxy(30,6);
+                printf("Press any button to return to the main menu.");
+                getch();
+                return;
+        }
+
+        movieCategory* dataInPos = position->value;
+        movieType* movieData = firstList(dataInPos->movie_list);
+        printf("\n");
+
+        while(position != NULL){
+
+                while(movieData != NULL){
+                        printf("%s\n", (char*)movieData->movieName);
+                        movieData = nextList(dataInPos->movie_list);
+                }
+
+                position = nextTreeMap(criteriaMap);
+                dataInPos = position->value;
+                movieData = firstList(dataInPos->movie_list);
+
+                printf("\n");
+        }
+
+        printf("\n");
+        centerText("All movies have been successfully analysed, press any button to return to the menu", 6);
+        getch();
+
+
         //Mostrar datos de la pelicula y pasar a siguiente posicion.
 
 }
