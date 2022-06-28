@@ -11,6 +11,7 @@
 #include "include/list.h"
 #include "include/hashmap.h"
 #include "include/treemap.h"
+#include "include/heap.h"
 #include "include/menu.h"
 #include "include/login.h"
 #include "include/csv.h"
@@ -583,9 +584,20 @@ void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){
         }
 }
 
+//Función que muestra el perfil del usuario que inició sesión
 void loggedProfile(userType* user)
 {
+        system("cls");
 
+        getch();
+}
+
+//Función que muestra el perfil de un usuario que se busca en el mapa
+void userProfile(HashMap* usersMap)
+{
+        system("cls");
+
+        getch();
 }
 
 //Función que muestra las opciones para ver los perfiles de algún usuario
@@ -608,7 +620,7 @@ void showProfiles(HashMap* usersMap, userType* loggedUser)
         {
                 case 1: loggedProfile(loggedUser);
                         break;
-                case 2: //userProfile(usersMap);
+                case 2: userProfile(usersMap);
                         break;
         }
 }

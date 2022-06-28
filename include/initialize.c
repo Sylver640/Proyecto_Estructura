@@ -63,7 +63,7 @@ movieType* createMovie()
 {
         movieType* new = (movieType*) malloc (sizeof(movieType));
         new->movie_id = (char*) malloc (100*sizeof(char));
-        new->movieName = (char*) malloc (200*sizeof(char));
+        new->movieName = (char*) malloc (300*sizeof(char));
         new->year = (int*) malloc (sizeof(int));
         new->genres = createList();
         new->runtime = (int*) malloc (sizeof(int));
