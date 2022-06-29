@@ -10,4 +10,4 @@ void heap_push(Mheap* pq, void* data, double priority);
 void heap_pop(Mheap* pq);
 
 
-#endif /* HashMap_h */
+#endif

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <dirent.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "list.h"
 #include "hashmap.h"
@@ -87,12 +88,15 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
         }
 
         char* searched_genre = firstList(movie->genres);
+        Par* searchGenre;
         while (searched_genre != NULL)
         {
-                if (searchMap(user->moviesByGenre, searched_genre) == NULL)
+                searchGenre = searchMap(user->moviesByGenre, searched_genre);
+                if (searchGenre == NULL)
                 {
                         movieCategory* newCategory = (movieCategory*) malloc (sizeof(movieCategory));
                         newCategory->name = (char*) malloc (100*sizeof(char));
+                        searched_genre[0] = toupper(searched_genre[0]);
                         strcpy(newCategory->name, searched_genre);
                         newCategory->movie_list = createList();
                         newCategory->numberOfMovies = 0;
@@ -102,8 +106,7 @@ void insertMovie(HashMap* globalMap, movieType* movie, userType* user, char* yea
                 }
                 else
                 {
-                        Par* searchData = searchMap(user->moviesByGenre, searched_genre);
-                        movieCategory* genreInMap = searchData->value;
+                        movieCategory* genreInMap = searchGenre->value;
                         pushBack(genreInMap->movie_list, movie);
                         genreInMap->numberOfMovies++;
                 }

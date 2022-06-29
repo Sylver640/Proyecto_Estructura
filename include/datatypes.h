@@ -20,7 +20,7 @@ typedef struct movieType //Representa a cada película
 typedef struct userType //Guarda todo lo necesario para el usuario
 {
         char* user_id;
-        int movieNumber;
+        long movieNumber;
         HashMap* movieMap; //mapa general
         TreeMap* abcOrder; //orden alfabético
         TreeMap* yearOrder; //orden de lanzamiento
@@ -33,7 +33,7 @@ typedef struct movieCategory //Corresponde a cada categoría que se puede encasi
 {
         char* name;
         List* movie_list;
-        long numberOfMovies;
+        double numberOfMovies;
 } movieCategory;
 
 #endif

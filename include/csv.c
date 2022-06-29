@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <conio.h>
+#include <ctype.h>
 
 #include "list.h"
 #include "datatypes.h"
@@ -55,6 +56,7 @@ void split_and_AddGenres(char* genres, movieType* movie)
         {
                 while (token != NULL)
                 {
+                        token[0] = toupper(token[0]);
                         pushBack(movie->genres, token); //se agrega a la lista
                         token = strtok(NULL, limit); //se avanza al siguiente género si es que hay
                 }
