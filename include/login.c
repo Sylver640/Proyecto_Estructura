@@ -250,12 +250,18 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                         if (strcmp(dir->d_name, ignored_file) == 0) //si se encuentra el nombre del usuario logueado, se continua al siguiente archivo
                                 continue;
 
-                        f = fopen(dir->d_name, "rt"); //se abre el archivo en modo lectura
                         char newuser_username[100];
                         if (strstr(dir->d_name, ".csv") != NULL) //se verifica que el archivo sea .csv, para evitar errores
                         {
                                 for (int i = 0; i < strlen(dir->d_name)-4; i++)
                                         newuser_username[i] = dir->d_name[i]; //se elimina el csv del nombre para copiarlo en los datos del usuario
+                                
+                                char path[100];
+                                
+                                snprintf(path, sizeof(path), "users/%s.csv", newuser_username);
+                                
+                                f = fopen(path, "rt"); //se abre el archivo en modo lectura
+
                         } else continue;
 
                         userType* newUser = createUser();
