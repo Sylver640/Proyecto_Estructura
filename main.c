@@ -118,7 +118,7 @@ void import_csv(HashMap* globalMap, userType* user)
         system("cls");
         gotoxy(30,4);
         printf("Checking for \"ratings.csv\" file...\n");
-        getch();
+        Sleep(2000); //se espera dos segundos para que la pantalla actualice con la información correspondiente
 
         if (fileExists("ratings.csv") == 0) //Se busca si el archivo está presente en la raíz del programa. Es decir, donde se ubica el ejecutable
         {
@@ -255,6 +255,24 @@ movieType* searchMovieUserList(userType* user, char* movie_id)
         return NULL;
 }
 
+//funcion que recorre todo el arbol hasta que encuentra el ultimo par
+Pair* lastTreeMap (TreeMap * tree)
+{
+        Pair* current = firstTreeMap(tree);
+        if (current == NULL)
+        {
+                printf("there's no first element in the tree.\n");
+                return NULL; 
+        }
+        Pair* next = nextTreeMap(tree);
+        while (next != NULL)
+        {
+                current = next;
+                next = nextTreeMap(tree);
+        }
+        return current;
+}
+
 void movieDiscovery (HashMap* usersMap, userType* loggedUser)
 {
         getchar();
@@ -274,16 +292,16 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         userType* otherUser = searched_result->value;
         
         bool hasRecommended = false;
-        Pair* firstRating = firstTreeMap(otherUser->ratingOrder);
-        if (firstRating == NULL)
+        Pair* bestRating = lastTreeMap(otherUser->ratingOrder);
+        if (bestRating == NULL)
         {
                 //este usuario no ha calificado ninguna pelicula
                 printf("The user you are searching for has not rated any movie.\n");
                 getchar();
                 return;
         }
-        movieCategory* firstMovieRating = firstRating->value;
-        movieType* currentMovie = firstList(firstMovieRating->movie_list);
+        movieCategory* bestMovieRating = bestRating->value;
+        movieType* currentMovie = firstList(bestMovieRating->movie_list);
         while (currentMovie != NULL)
         {
                 //saltar peliculas ya vistas por el usuario
@@ -292,8 +310,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                         //película no ha sido vista, se recomienda a logged user
                         hasRecommended = true;
                         printf("movie name: %s\n", currentMovie->movieName);
-                        printf("movie ID: %s\n", currentMovie->movie_id);
-                        printf("year of release: %d\n", currentMovie->year);
+                        printf("year of release: %d\n", *(currentMovie->year));
                         printf("movie genres: ");
                         char* currentGenre = firstList(currentMovie->genres);
                         while(currentGenre != NULL)
@@ -302,11 +319,12 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                                 currentGenre = nextList(currentMovie->genres);
                         }
                         printf("\n");
-                        printf("user score: %d\n", currentMovie->userScore);
-                        printf("runtime: %d\n", currentMovie->runtime);
+                        printf("user score: %d\n", *(currentMovie->userScore));
+                        printf("runtime: %d\n", *(currentMovie->runtime));
                 }
-                currentMovie = nextList(firstMovieRating->movie_list);
+                currentMovie = nextList(bestMovieRating->movie_list);
         }
+        printf("Searching finished.\n");
         if (hasRecommended == false)
         {
                 //no se han encontrado peliculas por recomendar
@@ -674,6 +692,7 @@ void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){ //
         }
 }
 
+//Función para mostrar el perfil de un usuario
 void showProfile(userType* user, Mheap* genres, Mheap* favorites)
 {
         gotoxy(35, 1);
@@ -682,12 +701,13 @@ void showProfile(userType* user, Mheap* genres, Mheap* favorites)
         printf("Movies Watched: %ld\n", user->movieNumber);
         gotoxy(28, 3);
         printf("Favorite Movies: ");
-        int k = 4;
+        int k = 4; //contador de pixeles verticales para imprimir de mejor manera cada valor con salto de línea
         for (int i = 0; i < 5; i++)
         {
-                movieType* favorite = heap_top(favorites);
-                heap_pop(favorites);
-                printf ("%s (%i)\n", favorite->movieName, *favorite->year);
+                //Aquí se muestran las 5 películas con mejor rating
+                movieType* favorite = heap_top(favorites); //Se saca la primera película del montículo
+                heap_pop(favorites); //Se elimina la película
+                printf ("%s (%i)\n", favorite->movieName, *favorite->year); //Se imprime en pantalla su nombre y año
                 gotoxy(45, k);
                 k++;
         }
@@ -695,13 +715,14 @@ void showProfile(userType* user, Mheap* genres, Mheap* favorites)
         printf("Least Favorite Movies: ");
         int i = 0;
         k = 9;
-        Pair* data = firstTreeMap(user->ratingOrder);
+        Pair* data = firstTreeMap(user->ratingOrder); //dato auxiliar para recorrer el mapa
         while (data != NULL)
         {
                 movieCategory* worse = data->value;
                 movieType* movie = firstList(worse->movie_list);
                 while (movie != NULL)
                 {
+                        //Aquí se muestran las 5 películas con peor rating
                         if (i >= 5) break;       
                         printf("%s (%i)\n", movie->movieName, *movie->year);
                         gotoxy(45, k);
@@ -711,20 +732,34 @@ void showProfile(userType* user, Mheap* genres, Mheap* favorites)
                 }
                 data = nextTreeMap(user->ratingOrder);
         }
-        gotoxy(22, 13);
-        printf("%s most viewed genres: ", user->user_id);
-
-        //gotoxy(22, 14);
-        //printf("Press any key to return");
+        gotoxy(18, 13);
+        printf("%s's most viewed genres: ", user->user_id);
+        k = 14;
+        for (int i = 0; i < 5; i++)
+        {
+                //Mientras que aquí se muestran los 5 géneros más vistos por el usuario
+                movieCategory* genre = heap_top(genres);
+                heap_pop(genres);
+                printf("%s (%.0lf movies)\n", genre->name, genre->numberOfMovies);
+                gotoxy(45, k);
+                k++;
+        }
+        gotoxy(30, 19);
+        printf("Press any key to return\n");
         getch();
 }
+
+/* La razón para el uso de montículo en las siguientes dos funciones es para tener un nuevo orden para cada mapa, sin recurrir a
+métodos más lentos como un arreglo ordenado o lista ordenada  */
 
 //Función que muestra el perfil del usuario que inició sesión
 void loggedProfile(userType* user)
 {
         system("cls");
 
-        Mheap* genreOrder = createMheap();
+        //Se ordenan los generos de más a menos vistos
+
+        Mheap* genreOrder = createMheap(); 
         Par* genreData = firstMap(user->moviesByGenre);
         while (genreData != NULL)
         {
@@ -732,6 +767,8 @@ void loggedProfile(userType* user)
                 heap_push(genreOrder, genre, genre->numberOfMovies);
                 genreData = nextMap(user->moviesByGenre);
         }
+
+        //Se ordenan las películas de mejor a peor
 
         Mheap* ratingOrder = createMheap();
         Pair* ratingData = firstTreeMap(user->ratingOrder);
@@ -748,21 +785,63 @@ void loggedProfile(userType* user)
                 ratingData = nextTreeMap(user->ratingOrder);
         }
 
-        /*for (int i = 0; i < 3; i++)
-        {
-                movieCategory* genre = heap_top(genreOrder);
-                heap_pop(genreOrder);
-                printf("genero: %s // cantidad: %.0lf\n", genre->name, genre->numberOfMovies);
-        }*/
-
         showProfile(user, genreOrder, ratingOrder);
 }
 
 //Función que muestra el perfil de un usuario que se busca en el mapa
 void userProfile(HashMap* usersMap)
 {
+        char* username = (char*) malloc (100*sizeof(char));
 
-        getch();
+        system("cls");
+        gotoxy(30, 4);
+        printf("Enter the name of another user: ");
+        scanf("%s", username);
+        getchar();
+
+        Par* data = searchMap(usersMap, username); //si el usuario no se encuentra, se retorna al menú principal
+        if (data == NULL)
+        {
+                gotoxy(30, 6);
+                printf("There seems to be no user with this name...");
+                gotoxy(30,7);
+                printf("Press any key to return to the main menu");
+                getch();
+                return;
+        }
+
+        system("cls");
+
+        //Se ordenan los géneros
+
+        userType* user = data->value;
+        Mheap* genreOrder = createMheap();
+        Par* genreData = firstMap(user->moviesByGenre);
+        while (genreData != NULL)
+        {
+                movieCategory* genre = genreData->value;
+                heap_push(genreOrder, genre, genre->numberOfMovies);
+                genreData = nextMap(user->moviesByGenre);
+        }
+
+        //Se ordenan las películas de mejores a peores
+
+        Mheap* ratingOrder = createMheap();
+        Pair* ratingData = firstTreeMap(user->ratingOrder);
+        while (ratingData != NULL)
+        {
+                movieCategory* rating = ratingData->value;
+                movieType* movie = firstList(rating->movie_list);
+                while (movie != NULL)
+                {
+                        double score = *movie->userScore;
+                        heap_push(ratingOrder, movie, score);
+                        movie = nextList(rating->movie_list);
+                }
+                ratingData = nextTreeMap(user->ratingOrder);
+        }
+
+        showProfile(user, genreOrder, ratingOrder);
 }
 
 //Función que muestra las opciones para ver los perfiles de algún usuario

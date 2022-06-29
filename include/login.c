@@ -256,8 +256,10 @@ void addOtherUsers(char* ignored_user, HashMap* usersMap, HashMap* globalMovieMa
                                 for (int i = 0; i < strlen(dir->d_name)-4; i++)
                                         newuser_username[i] = dir->d_name[i]; //se elimina el csv del nombre para copiarlo en los datos del usuario
                                 
+                                //Como la variable "d" solo lee el directorio, es necesario hacer la clásica snprintf para abrir cada usuario
+                                //dentro de la carpeta users
+
                                 char path[100];
-                                
                                 snprintf(path, sizeof(path), "users/%s.csv", newuser_username);
                                 
                                 f = fopen(path, "rt"); //se abre el archivo en modo lectura
