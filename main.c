@@ -394,60 +394,60 @@ void userDiscovery (userType* loggedUser, HashMap* usersMap)
         getchar();
 }
 
-void searchByID(HashMap* allMovies, char* ID){
-        system("cls");
-        Par* foundMovie = searchMap(allMovies, ID);
+void searchByID(HashMap* allMovies, char* ID){ //Función que ayuda a buscar una película por su ID.
+        system("cls"); 
+        Par* foundMovie = searchMap(allMovies, ID); //Variable que recibirá el pair de la película si se halla.
         gotoxy(30,4);
         printf("Searching for the movie...");
-        Sleep(3000);
-        if(foundMovie != NULL){
+        Sleep(3000); 
+        if(foundMovie != NULL){ //Si se encuentra la película, se procede a mostrar sus datos.
             system("cls");
             gotoxy(30,1);    
-            printf("Your movie has been found!\n\n");    
-            movieType* movieData = foundMovie->value;
+            printf("Your movie has been found!\n\n");  
+            movieType* movieData = foundMovie->value; //Variable para acceder a los datos de la película.
             gotoxy(30,3);
-            printf("Title: %s\n", movieData->movieName);
+            printf("Title: %s\n", movieData->movieName); //Nombre. 
             gotoxy(30,4);
-            printf("ID: %s\n", movieData->movie_id);
+            printf("ID: %s\n", movieData->movie_id); //ID.
             gotoxy(30,5);
-            printf("Year: %d\n", *movieData->year);
+            printf("Year: %d\n", *movieData->year); //Año.
             gotoxy(30,6);
-            char* genre = firstList(movieData->genres);
+            char* genre = firstList(movieData->genres); //Variable para acceder a la lista de generos de la película.
             printf("Genres: ");
             if(genre != NULL){
-                printf("%s", genre);
+                printf("%s", genre); //Se muestra el primer genero, los demas irán acompañados de una coma.
                 genre = nextList(movieData->genres);
                 while(genre != NULL){
                   printf(", %s", genre);
                   genre = nextList(movieData->genres);
                 }
-                printf(".");
+                printf("."); //Al llegar al último genero, se imprime un punto.
             }
             printf("\n");
             gotoxy(30,7);
-            printf("User Score: %d\n", *movieData->userScore);
+            printf("User Score: %d\n", *movieData->userScore); //Puntuación del usuario (1 al 10).
             gotoxy(30,8);
-            printf("Runtime: %d minutes\n", *movieData->runtime);
+            printf("Runtime: %d minutes\n", *movieData->runtime); //Duración de película en minutos.
 
             gotoxy(30,10);
-            printf("Press any button to return to the main menu.");
+            printf("Press any button to return to the main menu."); 
 
-        }else{
+        }else{ //Si no se halla la película, se avisa al usuario al respecto.
           system("cls");      
           gotoxy(30,4);
           printf("We are sorry, your movie could not be found.\n");
           gotoxy(30,6);
           printf("Press any button to return to the main menu.");
         }
-        getch();
+        getch(); //Terminado el proceso, se espera a que el usuario oprima cualquier botón para volver al menú principal.
 }
 
-void showMoviesTitle(TreeMap* TitleMap, char* user_Name){
+void showMoviesTitle(TreeMap* TitleMap, char* user_Name){ //Muestras las películas ordenadas por alfabeto.
         gotoxy(30,4);
-        printf("Preparing to show the movies...");
+        printf("Preparing to show the movies..."); 
         Sleep(2000);
-        Pair* position = firstTreeMap(TitleMap);
-        if(position == NULL){
+        Pair* position = firstTreeMap(TitleMap); //Se ingresa a la primera posicion del mapa de películas.
+        if(position == NULL){ //Si no existe, entonces no hay películas aún.
                 system("cls");
                 gotoxy(30,4);
                 printf("There are no movies to show!");
@@ -459,24 +459,24 @@ void showMoviesTitle(TreeMap* TitleMap, char* user_Name){
 
         printf("\n");
 
-        while(position != NULL){
-                movieType* dataInPos = position->value;
-                printf("%s, %d\n", dataInPos->movieName, *dataInPos->year);
-                position = nextTreeMap(TitleMap);
+        while(position != NULL){ //Muestra películas de la A a la Z.
+                movieType* dataInPos = position->value; //Acceder a datos de una posicion.
+                printf("%s, %d\n", dataInPos->movieName, *dataInPos->year); 
+                position = nextTreeMap(TitleMap); 
         }
 
         printf("\n");
         printf("All movies have been successfully analysed, press any button to return to the menu");
-        getch();
+        getch(); //Terminado el proceso, se regresa al menú principal al presionar cualquier botón.
 
 }
 
-void showMoviesThreeFiveSix(TreeMap* criteriaMap, char* user_Name){
+void showMoviesThreeFiveSix(TreeMap* criteriaMap, char* user_Name){ //Muestra películas ordenadas por Rating, duración o fecha de lanzamiento.
         gotoxy(30,4);
         printf("Preparing to show the movies...");
         Sleep(2000);
-        Pair* position = firstTreeMap(criteriaMap);
-        if(position == NULL){
+        Pair* position = firstTreeMap(criteriaMap); //Recibe la primera posicion del mapa categorizado.
+        if(position == NULL){ //Si no existen peliculas, se avisa al usuario y se retorna al menú principal.
                 system("cls");
                 gotoxy(30,4);
                 printf("There are no movies to show!");
@@ -488,30 +488,29 @@ void showMoviesThreeFiveSix(TreeMap* criteriaMap, char* user_Name){
 
         printf("\n");
 
-        while(position != NULL){
-                movieCategory* dataInPos = position->value;
-                movieType* movieData = firstList(dataInPos->movie_list);
+        while(position != NULL){ 
+                movieCategory* dataInPos = position->value; //Acceso a los datos de dicha posicion.
+                movieType* movieData = firstList(dataInPos->movie_list); //Acceso a datos de una pelicula.
 
 
-                while(movieData != NULL){
+                while(movieData != NULL){ //Se muestran las películas respetando la condición.
                         printf("%s, %d\n", movieData->movieName, *movieData->year);
                         movieData = nextList(dataInPos->movie_list);
                 }
 
-                position = nextTreeMap(criteriaMap);
+                position = nextTreeMap(criteriaMap); //Siguiente posición.
         }
 
         printf("\n");
         printf("All movies have been successfully analysed, press any button to return to the menu");
-        getch();
+        getch(); //Terminado el proceso, se regresa al menú principal al presionar cualquier botón.
 
 }
 
-void showMoviesGenre(HashMap* genreMap, char* user_Name){
-        //Pedir genero y hacer searchMap().
-        char* pickedGenre = (char*)malloc(100*sizeof(char));
+void showMoviesGenre(HashMap* genreMap, char* user_Name){ //Muestra las películas que contienen un cierto genero.
+        char* pickedGenre = (char*)malloc(100*sizeof(char)); //Recibe un genero insertado.
         gotoxy(30,4);
-        printf("Please enter a movie genre: ");
+        printf("Please enter a movie genre: "); //Se pide ingresar un genero de películas.
         scanf("%s", pickedGenre);
         getchar();
 
@@ -519,35 +518,35 @@ void showMoviesGenre(HashMap* genreMap, char* user_Name){
         gotoxy(30,4);
         printf("Preparing to show the movies...");
         Sleep(2000);
-        Par* foundGenre = searchMap(genreMap, pickedGenre);
-        if(foundGenre != NULL){
+        Par* foundGenre = searchMap(genreMap, pickedGenre); //Recibe par del genero hallado.
+        if(foundGenre != NULL){ //Si hay películas con dicho genero, se muestran por pantalla.
             system("cls");
             gotoxy(30,1);    
             printf("The movies that contain this genre are:\n\n");    
-            movieCategory* category = foundGenre->value;
-            movieType* movieData = firstList(category->movie_list);
+            movieCategory* category = foundGenre->value; //Ingreso a los datos de la categoría
+            movieType* movieData = firstList(category->movie_list); //Ingreso a las películas de la categoría.
 
-            while(movieData != NULL){
+            while(movieData != NULL){ //Se muestran las películas que contienen al genero.
                 printf("%s\n", movieData->movieName);
                 movieData = nextList(category->movie_list);
             }
 
             printf("\n\nPress any button to return to the main menu.");
-        }else{
+        }else{ //Si no hay peliculas con ese genero, se avisa al usuario por pantalla.
           system("cls");      
           gotoxy(30,4);
           printf("We are sorry, there are no movies containing this genre\n");
           gotoxy(30,6);
           printf("Press any button to return to the main menu.");
         }
-        getch();
+        getch(); //Terminado el proceso, se regresa al menú principal al presionar cualquier botón.
 
 }
 
-void showMoviesInYear(TreeMap* yearMap, char* user_Name){
-        int* pickedYear = (int*)malloc(sizeof(int));
+void showMoviesInYear(TreeMap* yearMap, char* user_Name){ //Muestra las películas lanzadas dentro de un año específico.
+        int* pickedYear = (int*)malloc(sizeof(int)); //Recibe el año insertado.
         gotoxy(30,4);
-        printf("Please enter a year of movies: ");
+        printf("Please enter a year of movies: "); //Se pide al usuario un año de lanzamientos.
         scanf("%i", pickedYear);
         getchar();
 
@@ -555,37 +554,32 @@ void showMoviesInYear(TreeMap* yearMap, char* user_Name){
         gotoxy(30,4);
         printf("Preparing to show the movies...");
         Sleep(2000);
-        Pair* foundYear = searchTreeMap(yearMap, pickedYear);
+        Pair* foundYear = searchTreeMap(yearMap, pickedYear); //Variable que recibe el par de un año.
 
-        if(foundYear != NULL){
+        if(foundYear != NULL){ //Si existen películas para dicho año, se muestran una tras una.
             system("cls");
             gotoxy(30,1);    
             printf("The movies released within this year are:\n\n");
-            movieCategory* dataInYear = foundYear->value;    
-            movieType* movieData = firstList(dataInYear->movie_list);
+            movieCategory* dataInYear = foundYear->value; //Para acceder a los datos de la categoría.
+            movieType* movieData = firstList(dataInYear->movie_list); //Para acceder a la lista de películas de dicha categoría.
 
-            while(movieData != NULL){
+            while(movieData != NULL){ //Se imprimen las películas lanzadas en el año insertado.
                 printf("%s\n", movieData->movieName);
-                movieData = nextList(dataInYear->movie_list);
+                movieData = nextList(dataInYear->movie_list); 
             }
 
             printf("\nPress any button to return to the main menu.");
-        }else{
+        }else{ //Si no existen películas para ese año, se avisa por pantalla.
           system("cls");      
           gotoxy(30,4);
           printf("We are sorry, there are no movies released within this year\n");
           gotoxy(30,6);
           printf("Press any button to return to the main menu.");
         }
-        getch();
-        //Pedir año como rango.
-        //Buscar la posicion con key dicho año.
-        //Mostrar todas las peliculas de la lista de ese genero y su info.
-
-
+        getch(); //Terminado el proceso, se regresa al menú principal al presionar cualquier botón.
 }
 
-void movieCriteria(userType* user_Info, char* user){
+void movieCriteria(userType* user_Info, char* user){ //Función que ayuda seleccionar criterio de películas.
         int option;
         system("cls");
         gotoxy(30, 2);
@@ -607,36 +601,36 @@ void movieCriteria(userType* user_Info, char* user){
 
         switch(option)
         {
-                case 1: system("cls");
+                case 1: system("cls"); //Por genero.
                         showMoviesGenre(user_Info->moviesByGenre, user);
                         break;
 
-                case 2: system("cls");
+                case 2: system("cls"); //Por año.
                         showMoviesInYear(user_Info->yearOrder, user);
                         break;
 
-                case 3: system("cls");
+                case 3: system("cls"); //Por Rating. (Menor a mayor)
                         showMoviesThreeFiveSix(user_Info->ratingOrder, user);
                         break;
 
-                case 4: system("cls");
+                case 4: system("cls"); //Por Titulo. (A-Z)
                         showMoviesTitle(user_Info->abcOrder, user);
                         break;
 
-                case 5: system("cls");
+                case 5: system("cls"); //Por duración. (Menor a mayor)
                         showMoviesThreeFiveSix(user_Info->runtimeOrder, user);
                         break;
 
-                case 6: system("cls");
+                case 6: system("cls"); //Por fecha de lanzamiento. (Orden cronológico)
                         showMoviesThreeFiveSix(user_Info->yearOrder, user);
                         break;
         }
 }
 
-void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){
-        int option;
-        char* user = (char*) malloc(100*sizeof(char));
-        Par* foundUser; 
+void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){ //Función encargada de enviar un usuario al menú de categorías.
+        int option; //Variable para elección de opción.
+        char* user = (char*) malloc(100*sizeof(char)); //Recibe un usuario insertado.
+        Par* foundUser; //Variable que recibirá el par de un usuario hallado en opción 2.
         system("cls");
         gotoxy(30, 2);
         printf("(1) Show your own movies\n");
@@ -649,27 +643,27 @@ void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){
 
         switch(option)
         {
-                case 1: system("cls");
+                case 1: system("cls"); //Se envían los datos del usuario que inició sesión al menú de categorías.
                         movieCriteria(loggedUserInfo, userName);
                         break;
 
                 case 2: system("cls");
                         gotoxy(30,4);
-                        printf("Please enter the user you're looking for: ");
+                        printf("Please enter the user you're looking for: "); //Se pide el nombre de un usuario.
                         scanf("%s", user);
                         system("cls");
                         gotoxy(30,4);
                         printf("Searching for your user...");
                         Sleep(3000);
-                        foundUser = searchMap(allUsers, user);
-                        if(foundUser != NULL){
+                        foundUser = searchMap(allUsers, user); 
+                        if(foundUser != NULL){ //Si el usuario es hallado, se avisa por pantalla y sus datos son enviados al menú de categorías.
                              gotoxy(30,5);
                              printf("The user has been found!");
                              Sleep(2000);   
-                             userType* userInfo = foundUser->value;
+                             userType* userInfo = foundUser->value; //Variable para acceder a los mapas de películas del usuario hallado.
                              movieCriteria(userInfo, user);
 
-                        }else{
+                        }else{ //En caso contrario, se avisa por pantalla y se retorna al menú principal.
                            gotoxy(30,5);
                            printf("The user has not been found.");
                            gotoxy(30,7);
@@ -841,7 +835,7 @@ int main()
                         break;
                 case 2: system("cls");
                         gotoxy(30,4);
-                        printf("Please enter the ID of the movie you are looking for: ");
+                        printf("Please enter the ID of the movie you are looking for: "); //Se pide al usuario que inserte el ID de una película.
                         scanf("%s", movieID);
                         getchar();
                         searchByID(globalMovieMap, movieID);
