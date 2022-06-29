@@ -323,7 +323,7 @@ List* findAllMatchingMovies (userType* user1, userType* user2)
         {
                 printf("error creating list of matching movies\n");
                 getchar();
-                return;
+                return NULL;
         }
         Par* currentMoviePair = firstMap(user1->movieMap);
         while (currentMoviePair != NULL)
