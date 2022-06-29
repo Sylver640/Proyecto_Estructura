@@ -695,7 +695,8 @@ void userChoice(HashMap* allUsers, char* userName, userType* loggedUserInfo){ //
 //Función para mostrar el perfil de un usuario
 void showProfile(userType* user, Mheap* genres, Mheap* favorites)
 {
-        if (firstMap(user->movieMap) == NULL)
+        Par* test = firstMap(user->movieMap);
+        if (test == NULL)
         {
                 gotoxy(30,4);
                 printf("%s haven't any movies yet!\n");
