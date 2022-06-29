@@ -257,6 +257,7 @@ movieType* searchMovieUserList(userType* user, char* movie_id)
 
 void movieDiscovery (HashMap* usersMap, userType* loggedUser)
 {
+        getchar();
         char username[100];
         printf("Enter other username for comparison: ");
         scanf("%[^\n]s", username);
@@ -265,12 +266,22 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         Par* searched_result = searchMap(usersMap, username);
         if ( searched_result == NULL)
         {
+                //no se ha encontrado el usuario buscado
                 printf("The user you are searching for does not exist.");
+                getchar();
                 return;
         }
         userType* otherUser = searched_result->value;
         
+        bool hasRecommended = false;
         Pair* firstRating = firstTreeMap(otherUser->ratingOrder);
+        if (firstRating == NULL)
+        {
+                //este usuario no ha calificado ninguna pelicula
+                printf("The user you are searching for has not rated any movie.\n");
+                getchar();
+                return;
+        }
         movieCategory* firstMovieRating = firstRating->value;
         movieType* currentMovie = firstList(firstMovieRating->movie_list);
         while (currentMovie != NULL)
@@ -279,6 +290,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                 if (searchMovieUserList(loggedUser, currentMovie->movie_id) == NULL)
                 {
                         //película no ha sido vista, se recomienda a logged user
+                        hasRecommended = true;
                         printf("movie name: %s\n", currentMovie->movieName);
                         printf("movie ID: %s\n", currentMovie->movie_id);
                         printf("year of release: %d\n", currentMovie->year);
@@ -295,8 +307,15 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                 }
                 currentMovie = nextList(firstMovieRating->movie_list);
         }
+        if (hasRecommended == false)
+        {
+                //no se han encontrado peliculas por recomendar
+                printf("Sorry, we couldn't find a movie to recommend you :(\n");
+        }
+        getchar();
 }
 
+//función para encontrar todas las películas en comun que han visto usuario1 y usuario2
 List* findAllMatchingMovies (userType* user1, userType* user2)
 {
         List* matchingMovies = createList();
@@ -329,23 +348,26 @@ int calculateAffinity (userType* user1, userType* user2)
 
                 //calculo afinidad, afinidad es un porcentaje que va de 0 a 100
                 //100 siendo la misma nota, y 1 cuando las notas son los extremos opuestos
-                int affinity = 100 - (abs(score1-score2))*11; 
+                int affinity = 100 - (abs(score1-score2))*11; //se necesita el valor absoluto del calculo
                 sumAffinity += affinity; //se suma la afinidad a la cantidad total de afinidad
                 currentMovieID = nextList(matchingMovies);
         }
         if (numMovies == 0) return 0;
-        int avgAffinity = sumAffinity / numMovies;
+        //afinidad promedio se calcula con la suma de las afinidades dividido por el numero de peliculas
+        int avgAffinity = sumAffinity / numMovies; 
         return avgAffinity;
 }
 
 void userDiscovery (userType* loggedUser, HashMap* usersMap)
 {
         printf("Searching for compatible users...\n");
+        getchar();
         Par* currentUserPair = firstMap(usersMap);
         while (currentUserPair != NULL)
         {
                 userType* currentUser = currentUserPair->value;
                 int affinity = calculateAffinity(loggedUser, currentUser);
+                //se consideran usuarios afines a aquellos que tengan más o igual a 75% de afinidad
                 if (affinity >= 75)
                 {
                         printf("user name: %s\n", currentUser->user_id);
@@ -356,6 +378,7 @@ void userDiscovery (userType* loggedUser, HashMap* usersMap)
                 currentUserPair = nextMap(usersMap);
         }
         printf("Search finished.\n");
+        getchar();
 }
 
 void searchByID(HashMap* allMovies, char* ID){
@@ -406,7 +429,36 @@ void searchByID(HashMap* allMovies, char* ID){
         getch();
 }
 
-void showMoviesThreeToSix(TreeMap* criteriaMap, char* user_Name){
+void showMoviesTitle(TreeMap* TitleMap, char* user_Name){
+        gotoxy(30,4);
+        printf("Preparing to show the movies...");
+        Sleep(2000);
+        Pair* position = firstTreeMap(TitleMap);
+        if(position == NULL){
+                system("cls");
+                gotoxy(30,4);
+                printf("There are no movies to show!");
+                gotoxy(30,6);
+                printf("Press any button to return to the main menu.");
+                getch();
+                return;
+        }
+
+        printf("\n");
+
+        while(position != NULL){
+                movieType* dataInPos = position->value;
+                printf("%s, %d\n", dataInPos->movieName, *dataInPos->year);
+                position = nextTreeMap(TitleMap);
+        }
+
+        printf("\n");
+        printf("All movies have been successfully analysed, press any button to return to the menu");
+        getch();
+
+}
+
+void showMoviesThreeFiveSix(TreeMap* criteriaMap, char* user_Name){
         gotoxy(30,4);
         printf("Preparing to show the movies...");
         Sleep(2000);
@@ -421,22 +473,19 @@ void showMoviesThreeToSix(TreeMap* criteriaMap, char* user_Name){
                 return;
         }
 
-        movieCategory* dataInPos = position->value;
-        movieType* movieData = firstList(dataInPos->movie_list);
         printf("\n");
 
         while(position != NULL){
+                movieCategory* dataInPos = position->value;
+                movieType* movieData = firstList(dataInPos->movie_list);
+
 
                 while(movieData != NULL){
-                        printf("%s\n", (char*)movieData->movieName);
+                        printf("%s, %d\n", movieData->movieName, *movieData->year);
                         movieData = nextList(dataInPos->movie_list);
                 }
 
                 position = nextTreeMap(criteriaMap);
-                dataInPos = position->value;
-                movieData = firstList(dataInPos->movie_list);
-
-                printf("\n");
         }
 
         printf("\n");
@@ -447,10 +496,11 @@ void showMoviesThreeToSix(TreeMap* criteriaMap, char* user_Name){
 
 void showMoviesGenre(HashMap* genreMap, char* user_Name){
         //Pedir genero y hacer searchMap().
-        char* pickedGenre;
+        char* pickedGenre = (char*)malloc(100*sizeof(char));
         gotoxy(30,4);
         printf("Please enter a movie genre: ");
         scanf("%s", pickedGenre);
+        getchar();
 
         system("cls");
         gotoxy(30,4);
@@ -465,7 +515,7 @@ void showMoviesGenre(HashMap* genreMap, char* user_Name){
             movieType* movieData = firstList(category->movie_list);
 
             while(movieData != NULL){
-                printf("Title: %s\n", movieData->movieName);
+                printf("%s\n", movieData->movieName);
                 movieData = nextList(category->movie_list);
             }
 
@@ -481,7 +531,40 @@ void showMoviesGenre(HashMap* genreMap, char* user_Name){
 
 }
 
-void showMoviesInYear(TreeMap* criteriaMap, char* user_Name){
+void showMoviesInYear(TreeMap* yearMap, char* user_Name){
+        int* pickedYear = (int*)malloc(sizeof(int));
+        gotoxy(30,4);
+        printf("Please enter a year of movies: ");
+        scanf("%i", pickedYear);
+        getchar();
+
+        system("cls");
+        gotoxy(30,4);
+        printf("Preparing to show the movies...");
+        Sleep(2000);
+        Pair* foundYear = searchTreeMap(yearMap, pickedYear);
+
+        if(foundYear != NULL){
+            system("cls");
+            gotoxy(30,1);    
+            printf("The movies released within this year are:\n\n");
+            movieCategory* dataInYear = foundYear->value;    
+            movieType* movieData = firstList(dataInYear->movie_list);
+
+            while(movieData != NULL){
+                printf("%s\n", movieData->movieName);
+                movieData = nextList(dataInYear->movie_list);
+            }
+
+            printf("\nPress any button to return to the main menu.");
+        }else{
+          system("cls");      
+          gotoxy(30,4);
+          printf("We are sorry, there are no movies released within this year\n");
+          gotoxy(30,6);
+          printf("Press any button to return to the main menu.");
+        }
+        getch();
         //Pedir año como rango.
         //Buscar la posicion con key dicho año.
         //Mostrar todas las peliculas de la lista de ese genero y su info.
@@ -520,19 +603,19 @@ void movieCriteria(userType* user_Info, char* user){
                         break;
 
                 case 3: system("cls");
-                        showMoviesThreeToSix(user_Info->ratingOrder, user);
+                        showMoviesThreeFiveSix(user_Info->ratingOrder, user);
                         break;
 
                 case 4: system("cls");
-                        showMoviesThreeToSix(user_Info->abcOrder, user);
+                        showMoviesTitle(user_Info->abcOrder, user);
                         break;
 
                 case 5: system("cls");
-                        showMoviesThreeToSix(user_Info->runtimeOrder, user);
+                        showMoviesThreeFiveSix(user_Info->runtimeOrder, user);
                         break;
 
                 case 6: system("cls");
-                        showMoviesThreeToSix(user_Info->yearOrder, user);
+                        showMoviesThreeFiveSix(user_Info->yearOrder, user);
                         break;
         }
 }
