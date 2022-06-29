@@ -304,15 +304,13 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         movieType* currentMovie = firstList(bestMovieRating->movie_list);
         while (currentMovie != NULL)
         {
-                //printf("revisando si pelicula %s ha sido vista por el usuario\n", currentMovie->movieName);
                 //saltar peliculas ya vistas por el usuario
                 if (searchMovieUserList(loggedUser, currentMovie->movie_id) == NULL)
                 {
                         //película no ha sido vista, se recomienda a logged user
                         hasRecommended = true;
                         printf("movie name: %s\n", currentMovie->movieName);
-                        printf("movie ID: %s\n", currentMovie->movie_id);
-                        printf("year of release: %d\n", currentMovie->year);
+                        printf("year of release: %d\n", *(currentMovie->year));
                         printf("movie genres: ");
                         char* currentGenre = firstList(currentMovie->genres);
                         while(currentGenre != NULL)
@@ -321,11 +319,12 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                                 currentGenre = nextList(currentMovie->genres);
                         }
                         printf("\n");
-                        printf("user score: %d\n", currentMovie->userScore);
-                        printf("runtime: %d\n", currentMovie->runtime);
+                        printf("user score: %d\n", *(currentMovie->userScore));
+                        printf("runtime: %d\n", *(currentMovie->runtime));
                 }
                 currentMovie = nextList(bestMovieRating->movie_list);
         }
+        printf("Searching finished.\n");
         if (hasRecommended == false)
         {
                 //no se han encontrado peliculas por recomendar
