@@ -246,7 +246,6 @@ void addMovies(HashMap* globalMap, userType* user)
 //función para ver si una película ha sido vista por logged user
 movieType* searchMovieUserList(userType* user, char* movie_id) 
 {
-        //printf("buscando pelicula %s en usuario %s\n", movie_id, user->user_id);
         Par* searchResult = searchMap(user->movieMap, movie_id);
         if (searchResult != NULL)
         {
@@ -344,15 +343,23 @@ List* findAllMatchingMovies (userType* user1, userType* user2)
                 getchar();
                 return NULL;
         }
-        Par* currentMoviePair = firstMap(user1->movieMap);
-        while (currentMoviePair != NULL)
+
+        Pair* currentRating = firstTreeMap(user1->ratingOrder);
+        while(currentRating != NULL)
         {
-                movieType* foundMovie = searchMovieUserList(user2, currentMoviePair->key);
-                if (foundMovie != NULL)
-                {       
-                        pushBack(matchingMovies, foundMovie->movie_id);
+                movieCategory* currentMovieRating = currentRating->value;
+                movieType* currentMovie = firstList(currentMovieRating->movie_list);
+
+                while (currentMovie != NULL)
+                {
+                        movieType* foundMovie = searchMovieUserList(user2, currentMovie->movie_id);
+                        if (foundMovie != NULL)
+                        {       
+                                pushBack(matchingMovies, foundMovie->movie_id);
+                        }
+                        currentMovie = nextList(currentMovieRating->movie_list);
                 }
-                currentMoviePair = nextMap(user1->movieMap);
+                currentRating = nextTreeMap(user1->ratingOrder);
         }
         return matchingMovies;
 }
@@ -368,7 +375,6 @@ int calculateAffinity (userType* user1, userType* user2)
                 numMovies++;
                 movieType* movie1 = searchMovieUserList(user1, currentMovieID);
                 movieType* movie2 = searchMovieUserList(user2, currentMovieID);
-                //printf("comparando ratings de pelicula %s\n", movie1->movieName);
                 int score1 = *(movie1->userScore);
                 int score2 = *(movie2->userScore);
 
@@ -393,17 +399,19 @@ void userDiscovery (HashMap* usersMap, userType* loggedUser)
         while (currentUserPair != NULL)
         {
                 userType* currentUser = currentUserPair->value;
-                //printf("comparando con usuario %s\n", currentUser->user_id);
-                int affinity = calculateAffinity(loggedUser, currentUser);
-                //se consideran usuarios afines a aquellos que tengan más o igual a 75% de afinidad
-                if (affinity >= 75)
+                if (strcmp(currentUser->user_id, loggedUser->user_id) != 0)
                 {
-                        hasFoundUser = true;
-                        printf("user name: %s\n", currentUser->user_id);
-                        printf("number of movies: %d\n", currentUser->movieNumber);
-                        printf("affinity percentage: %d\n", affinity);
-                        printf("\n");
-                }
+                        int affinity = calculateAffinity(loggedUser, currentUser);
+                        //se consideran usuarios afines a aquellos que tengan más o igual a 75% de afinidad
+                        if (affinity >= 75)
+                        {
+                                hasFoundUser = true;
+                                printf("user name: %s\n", currentUser->user_id);
+                                printf("number of movies: %d\n", currentUser->movieNumber);
+                                printf("affinity percentage: %d\n", affinity);
+                                printf("\n");
+                        }
+                } 
                 currentUserPair = nextMap(usersMap);
                 if (currentUserPair->key == firstUserPair->key)
                 {
@@ -415,6 +423,7 @@ void userDiscovery (HashMap* usersMap, userType* loggedUser)
                 printf("No users have been found. \n");
         }
         printf("Search finished.\n");
+        printf("Press enter to go back to menu.\n");
         getchar();
         getchar();
 }
