@@ -319,16 +319,23 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
 List* findAllMatchingMovies (userType* user1, userType* user2)
 {
         List* matchingMovies = createList();
+        if (matchingMovies == NULL)
+        {
+                printf("error creating list of matching movies\n");
+                getchar();
+                return;
+        }
         Par* currentMoviePair = firstMap(user1->movieMap);
         while (currentMoviePair != NULL)
         {
                 movieType* foundMovie = searchMovieUserList(user2, currentMoviePair->key);
                 if (foundMovie != NULL)
-                {
+                {       
                         pushBack(matchingMovies, foundMovie->movie_id);
                 }
                 currentMoviePair = nextMap(user1->movieMap);
         }
+        getchar();
         return matchingMovies;
 }
 
@@ -362,6 +369,7 @@ void userDiscovery (userType* loggedUser, HashMap* usersMap)
 {
         printf("Searching for compatible users...\n");
         getchar();
+        bool hasFoundUser = false;
         Par* currentUserPair = firstMap(usersMap);
         while (currentUserPair != NULL)
         {
@@ -370,12 +378,17 @@ void userDiscovery (userType* loggedUser, HashMap* usersMap)
                 //se consideran usuarios afines a aquellos que tengan más o igual a 75% de afinidad
                 if (affinity >= 75)
                 {
+                        hasFoundUser = true;
                         printf("user name: %s\n", currentUser->user_id);
                         printf("number of movies: %d\n", currentUser->movieNumber);
                         printf("affinity percentage: %d\n", affinity);
                         printf("\n");
                 }
                 currentUserPair = nextMap(usersMap);
+        }
+        if (hasFoundUser == false)
+        {
+                printf("No users have been found. \n");
         }
         printf("Search finished.\n");
         getchar();
