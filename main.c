@@ -246,6 +246,7 @@ void addMovies(HashMap* globalMap, userType* user)
 //función para ver si una película ha sido vista por logged user
 movieType* searchMovieUserList(userType* user, char* movie_id) 
 {
+        //printf("buscando pelicula %s en usuario %s\n", movie_id, user->user_id);
         Par* searchResult = searchMap(user->movieMap, movie_id);
         if (searchResult != NULL)
         {
@@ -353,7 +354,6 @@ List* findAllMatchingMovies (userType* user1, userType* user2)
                 }
                 currentMoviePair = nextMap(user1->movieMap);
         }
-        getchar();
         return matchingMovies;
 }
 
@@ -368,6 +368,7 @@ int calculateAffinity (userType* user1, userType* user2)
                 numMovies++;
                 movieType* movie1 = searchMovieUserList(user1, currentMovieID);
                 movieType* movie2 = searchMovieUserList(user2, currentMovieID);
+                //printf("comparando ratings de pelicula %s\n", movie1->movieName);
                 int score1 = *(movie1->userScore);
                 int score2 = *(movie2->userScore);
 
@@ -383,15 +384,16 @@ int calculateAffinity (userType* user1, userType* user2)
         return avgAffinity;
 }
 
-void userDiscovery (userType* loggedUser, HashMap* usersMap)
+void userDiscovery (HashMap* usersMap, userType* loggedUser)
 {
         printf("Searching for compatible users...\n");
-        getchar();
         bool hasFoundUser = false;
+        Par* firstUserPair = firstMap(usersMap);
         Par* currentUserPair = firstMap(usersMap);
         while (currentUserPair != NULL)
         {
                 userType* currentUser = currentUserPair->value;
+                //printf("comparando con usuario %s\n", currentUser->user_id);
                 int affinity = calculateAffinity(loggedUser, currentUser);
                 //se consideran usuarios afines a aquellos que tengan más o igual a 75% de afinidad
                 if (affinity >= 75)
@@ -403,12 +405,17 @@ void userDiscovery (userType* loggedUser, HashMap* usersMap)
                         printf("\n");
                 }
                 currentUserPair = nextMap(usersMap);
+                if (currentUserPair->key == firstUserPair->key)
+                {
+                        break;
+                }
         }
         if (hasFoundUser == false)
         {
                 printf("No users have been found. \n");
         }
         printf("Search finished.\n");
+        getchar();
         getchar();
 }
 
@@ -938,7 +945,7 @@ int main()
                         break;
                 case 5: system("cls");
                         gotoxy(30,4);
-                        userDiscovery(loggedUser, usersMap);
+                        userDiscovery(usersMap, loggedUser);
                         break;
                 case 6: showProfiles(usersMap, loggedUser);
                         break;
