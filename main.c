@@ -255,6 +255,24 @@ movieType* searchMovieUserList(userType* user, char* movie_id)
         return NULL;
 }
 
+//funcion que recorre todo el arbol hasta que encuentra el ultimo par
+Pair* lastTreeMap (TreeMap * tree)
+{
+        Pair* current = firstTreeMap(tree);
+        if (current == NULL)
+        {
+                printf("there's no first element in the tree.\n");
+                return NULL; 
+        }
+        Pair* next = nextTreeMap(tree);
+        while (next != NULL)
+        {
+                current = next;
+                next = nextTreeMap(tree);
+        }
+        return current;
+}
+
 void movieDiscovery (HashMap* usersMap, userType* loggedUser)
 {
         getchar();
@@ -274,18 +292,19 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
         userType* otherUser = searched_result->value;
         
         bool hasRecommended = false;
-        Pair* firstRating = firstTreeMap(otherUser->ratingOrder);
-        if (firstRating == NULL)
+        Pair* bestRating = lastTreeMap(otherUser->ratingOrder);
+        if (bestRating == NULL)
         {
                 //este usuario no ha calificado ninguna pelicula
                 printf("The user you are searching for has not rated any movie.\n");
                 getchar();
                 return;
         }
-        movieCategory* firstMovieRating = firstRating->value;
-        movieType* currentMovie = firstList(firstMovieRating->movie_list);
+        movieCategory* bestMovieRating = bestRating->value;
+        movieType* currentMovie = firstList(bestMovieRating->movie_list);
         while (currentMovie != NULL)
         {
+                //printf("revisando si pelicula %s ha sido vista por el usuario\n", currentMovie->movieName);
                 //saltar peliculas ya vistas por el usuario
                 if (searchMovieUserList(loggedUser, currentMovie->movie_id) == NULL)
                 {
@@ -305,7 +324,7 @@ void movieDiscovery (HashMap* usersMap, userType* loggedUser)
                         printf("user score: %d\n", currentMovie->userScore);
                         printf("runtime: %d\n", currentMovie->runtime);
                 }
-                currentMovie = nextList(firstMovieRating->movie_list);
+                currentMovie = nextList(bestMovieRating->movie_list);
         }
         if (hasRecommended == false)
         {
